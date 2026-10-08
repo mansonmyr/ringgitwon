@@ -119,7 +119,7 @@ export default function App() {
         </div>
       </section>
 
-      <ForecastCards rates={rates} news={news} onRefresh={() => void refresh(true)} />
+      <ForecastCards rates={rates} news={news} lastRefresh={lastRefresh} />
       <SignalRoom rates={rates} />
       <NewsBanner snapshot={news} stale={Boolean(newsError)} error={newsError} onRefresh={() => void refresh(true)} />
 
