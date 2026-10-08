@@ -3,6 +3,7 @@ import type { Headline, RatePoint } from '../types';
 const DAY = 86_400_000;
 export const PATH_COUNT = 2000;
 export const MIN_OBSERVATIONS = 60;
+export const MIN_WEEKDAY_RETURNS = 8;
 
 export function formatForecastPercent(percent: number): string {
   if (percent > 0 && percent < 1) return '<1%';
@@ -43,7 +44,18 @@ export function estimateForecast(points: RatePoint[], target: number, articles: 
   const firstDay = yearStart.getTime() / DAY;
   const history = [...new Map(points.filter(p => Number.isFinite(p.rate) && p.rate > 0 && /^\d{4}-\d{2}-\d{2}$/.test(p.date) && Date.parse(p.date) / DAY >= firstDay && Date.parse(p.date) / DAY <= today).map(p => [p.date, p])).values()].sort((a, b) => a.date.localeCompare(b.date));
   if (history.length < MIN_OBSERVATIONS) throw new Error('At least 60 historical observations are needed. Refresh history to calculate.');
-  const returns = history.slice(1).map((point, i) => Math.log(point.rate / history[i].rate));
+  // Match calendar-day returns to their ending weekday. A Friday–Monday gap
+  // is not a one-day return; exclude it rather than inventing weekend prices.
+  const returnsByWeekday: number[][] = Array.from({ length: 7 }, () => []);
+  let excludedGaps = 0;
+  history.slice(1).forEach((point, i) => {
+    if (Date.parse(point.date) - Date.parse(history[i].date) !== DAY) { excludedGaps++; return; }
+    returnsByWeekday[new Date(point.date).getUTCDay()].push(Math.log(point.rate / history[i].rate));
+  });
+  if (returnsByWeekday.some(pool => pool.length < MIN_WEEKDAY_RETURNS)) {
+    throw new Error('Forecast unavailable: history needs at least 8 consecutive-day changes for each day of the week. Refresh history; missing dates are not filled.');
+  }
+  const returns = returnsByWeekday.flat();
   const mean = returns.reduce((sum, value) => sum + value, 0) / returns.length;
   const volatility = Math.sqrt(returns.reduce((sum, value) => sum + (value - mean) ** 2, 0) / returns.length);
   const signal = newsSignal(articles);
@@ -59,13 +71,15 @@ export function estimateForecast(points: RatePoint[], target: number, articles: 
     const touched = [observedDay === today && rate >= target, false, false];
     for (let day = observedDay + 1; day <= windows[2].end; day++) {
       const weekday = new Date(day * DAY).getUTCDay();
-      if (weekday !== 0 && weekday !== 6) {
-        // News influence decays across 14 calendar days rather than compounding forever.
-        rate *= Math.exp(returns[Math.floor(random() * returns.length)] + signal.dailyAdjustment * Math.max(0, 1 - (day - today) / 14));
-      }
+      const pool = returnsByWeekday[weekday];
+      // Advance every calendar day using that weekday's observed changes.
+      // Keep the existing news heuristic limited to weekdays; its effect is
+      // unvalidated and decays across 14 calendar days.
+      const newsAdjustment = weekday !== 0 && weekday !== 6 ? signal.dailyAdjustment * Math.max(0, 1 - (day - today) / 14) : 0;
+      rate *= Math.exp(pool[Math.floor(random() * pool.length)] + newsAdjustment);
       windows.forEach((window, index) => { if (day >= window.start && day <= window.end && rate >= target) touched[index] = true; });
     }
     touched.forEach((hit, index) => { if (hit) hits[index]++; });
   }
-  return { windows: windows.map((window, i) => ({ ...window, hits: hits[i], paths: PATH_COUNT, percent: 100 * hits[i] / PATH_COUNT })), mean, volatility, signal, observations: history.length, historyStart: history[0].date, latest };
+  return { windows: windows.map((window, i) => ({ ...window, hits: hits[i], paths: PATH_COUNT, percent: 100 * hits[i] / PATH_COUNT })), mean, volatility, signal, observations: history.length, returnSamples: returns.length, weekdaySamples: returnsByWeekday.map(pool => pool.length), excludedGaps, historyStart: history[0].date, latest };
 }

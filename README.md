@@ -44,9 +44,11 @@ Set a personal target in the Plan section. Three cards use 2,000 simulated paths
 
 ### Forecast evaluation and MiroFish experiment
 
-The [historical report](devpost/validation/forecast-backtest.md) evaluates 393 overlapping cases using historical monthly origins and targets 1%, 3%, and 5% above the starting rate. Each forecast sees only its trailing year. The next-month mean estimate was 20.5%, versus 34.1% observed target hits. The simulator beats the no-change baseline but loses to a simple historical-frequency baseline for the first two horizons. Cases are correlated; this is exploratory evidence, not an independent accuracy claim. The source's weekend observations also need reconciliation with the simulator's weekday steps.
+The [historical report](devpost/validation/forecast-backtest.md) evaluates 393 overlapping cases using historical monthly origins and targets 1%, 3%, and 5% above the starting rate. Each forecast sees only its trailing year. The next-month mean estimate was 20.5%, versus 34.1% observed target hits. The simulator beats the no-change baseline but loses to a simple historical-frequency baseline for the first two horizons. Cases are correlated; this is exploratory evidence, not an independent accuracy claim. Those figures describe the preserved original model.
 
-Reproduce the saved snapshot and run focused implementation checks:
+The [calendar-corrected report](devpost/validation/forecast-calendar-v2.md) repeats the same cases with one-day changes sampled separately for each day of the week, including weekends. Missing-date returns are excluded, and eight samples per weekday are required. Next-month estimates average 26.5%, with lower probability error than the original model, but underestimation remains. This is development-data evidence, not an untouched holdout. The next-month score is approximately tied with the historical-frequency comparator.
+
+Reproduce the corrected report from the saved snapshot and run focused implementation checks (the original report is preserved):
 
 ```sh
 npm run check:forecast

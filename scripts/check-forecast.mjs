@@ -29,4 +29,23 @@ const lower = estimateForecast(varying, 305, [], now);
 const higher = estimateForecast(varying, 315, [], now);
 assert.ok(lower.windows.every((w, i) => Number.isFinite(w.percent) && w.percent >= higher.windows[i].percent && Math.abs(w.hits / w.paths * 100 - w.percent) < 1e-10));
 assert.ok(lower.windows[2].percent >= lower.windows[1].percent);
+// A synthetic series whose only movement occurs on Saturdays must still
+// reach a target over a Saturday–Sunday month-end (May 2026).
+const weekendNow = Date.parse('2026-05-29T23:59:59+08:00');
+let weekendRate = 100;
+const weekendPoints = Array.from({ length: 365 }, (_, i) => {
+  const date = new Date(Date.parse('2025-05-30') + i * DAY);
+  if (date.getUTCDay() === 6) weekendRate *= 1.01;
+  return { date: date.toISOString().slice(0, 10), rate: weekendRate };
+});
+const weekendForecast = estimateForecast(weekendPoints, weekendRate * 1.005, [], weekendNow);
+assert.equal(weekendForecast.windows[0].percent, 100, 'Saturday changes must be simulated on Saturday.');
+assert.equal(estimateForecast(weekendPoints, weekendRate * 1.015, [], weekendNow).windows[0].percent, 0, 'Saturday returns must not be applied again on Sunday.');
+const withGap = points.filter(p => p.date !== '2026-08-12');
+const gapForecast = estimateForecast(withGap, 301, [], now);
+assert.equal(gapForecast.excludedGaps, 1);
+assert.equal(gapForecast.returnSamples, points.length - 3, 'Missing dates must not be converted to one-day returns.');
+assert.equal(gapForecast.weekdaySamples.reduce((a, b) => a + b, 0), gapForecast.returnSamples);
+assert.throws(() => estimateForecast(points.filter(p => ![0, 6].includes(new Date(p.date).getUTCDay())), 301, [], now), /each day of the week/, 'Sparse calendars should fail explicitly, not fabricate weekend returns.');
 console.log('Forecast checks passed: deterministic paths, target monotonicity, exact fractions, calendar boundaries, history cutoffs, input errors, and zero/all-hit cases.');
+console.log('Calendar checks passed: Saturday movement, Sunday isolation, excluded gaps, sample counts and sparse-calendar errors.');
