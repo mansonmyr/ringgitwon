@@ -1,0 +1,33 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "rooms": {
+      "$roomCode": {
+        ".read": "auth != null",
+        ".write": "auth != null && ((!data.exists() && $roomCode.matches(/^[0-9]{6}$/) && newData.child('masterUid').val() === auth.uid) || (data.exists() && data.child('masterUid').val() === auth.uid && !newData.exists()))",
+        "sharedTarget": {
+          ".write": "auth != null && root.child('rooms').child($roomCode).child('masterUid').val() === auth.uid",
+          ".validate": "newData.isNumber() && newData.val() > 0"
+        },
+        "members": {
+          "$uid": {
+            ".write": "auth != null && auth.uid === $uid && root.child('rooms').child($roomCode).child('masterUid').exists()",
+            ".validate": "newData.hasChildren(['name', 'avatar', 'online'])",
+            "name": { ".validate": "newData.isString() && newData.val().length <= 20" },
+            "avatar": { ".validate": "newData.isString() && newData.val().length <= 12" },
+            "online": { ".validate": "newData.isBoolean()" },
+            "location": { ".validate": "newData.val() === 'nightWatch' || newData.val() === 'commonRoom'" },
+            "joinedAt": { ".validate": "newData.isNumber()" }
+          }
+        },
+        "alert": {
+          ".write": "auth != null && root.child('rooms').child($roomCode).child('members').child(auth.uid).exists()",
+          ".validate": "newData.hasChildren(['id', 'kind', 'from', 'message', 'createdAt'])",
+          "kind": { ".validate": "newData.val() === 'test' || newData.val() === 'rate'" },
+          "createdAt": { ".validate": "newData.isNumber()" }
+        }
+      }
+    }
+  }
+}
