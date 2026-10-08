@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { NewsSnapshot, RateSnapshot } from '../types';
-import { estimateForecast, forecastWindows, PATH_COUNT } from '../lib/forecast';
+import { estimateForecast, forecastWindows, formatForecastPercent, PATH_COUNT } from '../lib/forecast';
 import { fetchPeriodRates, readCachedPeriodRates, isRateStale, formatObservationDate, formatRate } from '../lib/rates';
 import { isNewsStale } from '../lib/news';
 
@@ -49,13 +49,16 @@ export function ForecastCards({ rates, news, onRefresh }: { rates: RateSnapshot 
       <button type="button" disabled={loading} onClick={() => { setRetry(value => value + 1); onRefresh(); }}>{loading ? 'LOADING HISTORY…' : 'REFRESH INPUTS'}</button>
     </form>
     <p className="forecast-caption">Minimum {formatRate(target)} KRW per RM1 · Personal planning target; your room keeps its own shared target.</p>
+    {result && <p className="forecast-caption">PAST-YEAR SIMULATION · {formatObservationDate(result.historyStart)} – {formatObservationDate(result.latest.date)} · {result.observations} available observations</p>}
     {(error || calculation.message) && <p className="stale-note" role="status">{error} {calculation.message}</p>}
     <div className="forecast-grid">
       {(result?.windows ?? forecastWindows(now)).map((window, index) => {
         const percent = result?.windows[index].percent;
+        const estimate = result?.windows[index];
         return <article className="forecast-card" key={window.label}>
           <span className="section-kicker">{window.label}</span><p className="forecast-dates">{dateLabel(window.start)} – {dateLabel(window.end)}</p>
-          <strong className="forecast-percent">{percent === undefined ? '—' : `${percent}%`}</strong><p className="forecast-caption">of simulated paths reach your target</p>
+          <strong className="forecast-percent">{percent === undefined ? '—' : formatForecastPercent(percent)}</strong><p className="forecast-caption">estimated target-reaching probability under this model</p>
+          {estimate && <p className="forecast-caption">{estimate.hits.toLocaleString()} of {estimate.paths.toLocaleString()} simulated paths reach your target.{estimate.hits === 0 ? ' No hits in this run does not mean impossible.' : estimate.hits === estimate.paths ? ' Every path reached it in this run; this is not a guarantee.' : ''}</p>}
           <div className="pixel-meter" role="img" aria-label={percent === undefined ? 'Estimate unavailable' : `${percent} percent on a zero to one hundred scale`}>
             {Array.from({ length: 20 }, (_, i) => <i key={i} className={percent !== undefined && i < Math.round(percent / 5) ? 'is-filled' : ''} />)}
           </div>
@@ -68,7 +71,7 @@ export function ForecastCards({ rates, news, onRefresh }: { rates: RateSnapshot 
         </article>;
       })}
     </div>
-    <details className="forecast-method"><summary>How these estimates work</summary><p>{PATH_COUNT.toLocaleString()} simulated paths resample observed rate changes, advancing on weekdays. Holidays are not modeled. Each window counts only touches within its own calendar dates in Kuala Lumpur. The next three months are three full months after this month.</p><p>The English headline heuristic recognizes “ringgit/MYR rises, gains, strengthens” and “Korean won/KRW falls, weakens, drops” as positive, and the reverse as negative. Other headlines have no directional effect. The adjustment is capped at ±0.005% per day and fades over 14 days. This simple rule cannot understand context or causality.</p></details>
+    <details className="forecast-method"><summary>How these estimates work</summary><p>Estimated probability = paths that reach or exceed your target ÷ {PATH_COUNT.toLocaleString()} paths × 100. The calculation samples daily changes from the past year to generate possible future paths; it does not train a machine-learning model.</p><p>{PATH_COUNT.toLocaleString()} simulated paths resample observed rate changes, advancing on weekdays. Holidays are not modeled. Each window counts only touches within its own calendar dates in Kuala Lumpur. The next three months are three full months after this month. The calculation assumes past changes remain representative and treats sampled changes as independent; it may miss new market conditions and prolonged trends.</p><p>The English headline heuristic recognizes “ringgit/MYR rises, gains, strengthens” and “Korean won/KRW falls, weakens, drops” as positive, and the reverse as negative. Other headlines have no directional effect. The adjustment is capped at ±0.005% per day and fades over 14 days. This simple rule cannot understand context or causality.</p></details>
     <p className="forecast-caption">Experimental, unvalidated scenarios—not a reliable probability or financial advice. Past changes may not repeat. Even 100% of simulated paths is no guarantee, and 0% does not mean impossible.</p>
   </section>;
 }

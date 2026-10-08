@@ -4,6 +4,12 @@ const DAY = 86_400_000;
 export const PATH_COUNT = 2000;
 export const MIN_OBSERVATIONS = 60;
 
+export function formatForecastPercent(percent: number): string {
+  if (percent > 0 && percent < 1) return '<1%';
+  if (percent > 99 && percent < 100) return '>99%';
+  return `${Number(percent.toFixed(1))}%`;
+}
+
 // Dates are calendar-day indices in Kuala Lumpur, independent of browser timezone.
 export function forecastWindows(now: number) {
   const today = Math.floor((now + 8 * 3_600_000) / DAY);
@@ -32,7 +38,10 @@ export function newsSignal(articles: Headline[]) {
 export function estimateForecast(points: RatePoint[], target: number, articles: Headline[], now = Date.now()) {
   if (!Number.isFinite(target) || target <= 0) throw new Error('Enter a target greater than zero.');
   const today = Math.floor((now + 8 * 3_600_000) / DAY);
-  const history = [...new Map(points.filter(p => Number.isFinite(p.rate) && p.rate > 0 && /^\d{4}-\d{2}-\d{2}$/.test(p.date) && Date.parse(p.date) / DAY <= today).map(p => [p.date, p])).values()].sort((a, b) => a.date.localeCompare(b.date));
+  const yearStart = new Date(today * DAY);
+  yearStart.setUTCFullYear(yearStart.getUTCFullYear() - 1);
+  const firstDay = yearStart.getTime() / DAY;
+  const history = [...new Map(points.filter(p => Number.isFinite(p.rate) && p.rate > 0 && /^\d{4}-\d{2}-\d{2}$/.test(p.date) && Date.parse(p.date) / DAY >= firstDay && Date.parse(p.date) / DAY <= today).map(p => [p.date, p])).values()].sort((a, b) => a.date.localeCompare(b.date));
   if (history.length < MIN_OBSERVATIONS) throw new Error('At least 60 historical observations are needed. Refresh history to calculate.');
   const returns = history.slice(1).map((point, i) => Math.log(point.rate / history[i].rate));
   const mean = returns.reduce((sum, value) => sum + value, 0) / returns.length;
@@ -58,5 +67,5 @@ export function estimateForecast(points: RatePoint[], target: number, articles: 
     }
     touched.forEach((hit, index) => { if (hit) hits[index]++; });
   }
-  return { windows: windows.map((window, i) => ({ ...window, percent: Math.round(100 * hits[i] / PATH_COUNT) })), mean, volatility, signal, observations: history.length, latest };
+  return { windows: windows.map((window, i) => ({ ...window, hits: hits[i], paths: PATH_COUNT, percent: 100 * hits[i] / PATH_COUNT })), mean, volatility, signal, observations: history.length, historyStart: history[0].date, latest };
 }

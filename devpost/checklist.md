@@ -93,3 +93,5 @@ Activity mode: [live app and editor, explicit static fallback, focused alternati
 
 - Roundtable build added: proposal duration, synchronized Follow/Fold/optional Hold cards, countdown using server offset, majority results, proposer tie extension/closure, and per-member all-Hold re-vote preferences. Shared target changes now use the table; the initial target is still chosen on room creation.
 - Security implementation keeps finalization with the existing room-master authority. Ballots are separate, member-owned records with server-enforced deadlines; finalization waits if the master is offline. Updated database.rules.json must be published before roundtable use. Production build passes; no multi-client or security-rule runtime tests were run in this turn. Slice 5 stays unchecked until those checks pass.
+
+- Forecast clarification: restrict inputs to the trailing year, expose the observed date range and successful-path counts, retain the unrounded simulation fraction, and display small nonzero probabilities as <1%. Added the probability formula and independence/market-change assumptions. Production build passes; predictive calibration remains unmeasured.
