@@ -3,9 +3,9 @@ import type { Database } from 'firebase/database';
 import type { RateSnapshot } from '../types';
 import { connectFirebaseMember, firebaseConfigured } from '../lib/firebase';
 import {
-  avatarFor, createRoom, dismissRoom, joinRoom, publishRateCrossing, sendTestAlert, setRoomLocation, subscribeRoom,
+  avatarFor, createRoom, dismissRoom, joinRoom, publishRateCrossing, sendTestAlert, subscribeRoom,
 } from '../lib/rooms';
-import type { RoomData, RoomIdentity, RoomLocation } from '../lib/rooms';
+import type { RoomData, RoomIdentity } from '../lib/rooms';
 import { formatRate } from '../lib/rates';
 import { Roundtable } from './Roundtable';
 
@@ -28,7 +28,6 @@ export function SignalRoom({ rates }: { rates: RateSnapshot | null }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [repeatPings, setRepeatPings] = useState(0);
-  const [locationBusy, setLocationBusy] = useState(false);
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission | 'unsupported'>(
     () => typeof window !== 'undefined' && 'Notification' in window ? Notification.permission : 'unsupported',
   );
@@ -207,19 +206,6 @@ export function SignalRoom({ rates }: { rates: RateSnapshot | null }) {
     } catch { /* Audio is best-effort; the visual alert still works. */ }
   }
 
-  async function moveToLocation(location: RoomLocation) {
-    if (!database || !member || !room || locationBusy) return;
-    setLocationBusy(true);
-    setError('');
-    try {
-      await setRoomLocation(database, roomCode, member.uid, location);
-    } catch (nextError) {
-      setError(nextError instanceof Error ? nextError.message : 'Could not change rooms.');
-    } finally {
-      setLocationBusy(false);
-    }
-  }
-
   function leaveRoom() {
     setRoomCode('');
     setRoom(null);
@@ -249,9 +235,7 @@ export function SignalRoom({ rates }: { rates: RateSnapshot | null }) {
 
   const isMaster = Boolean(member && room?.masterUid === member.uid);
   const members = Object.entries(room?.members ?? {});
-  const myLocation = member ? room?.members[member.uid]?.location ?? 'nightWatch' : 'nightWatch';
-  const nightWatchMembers = members.filter(([, traveler]) => (traveler.location ?? 'nightWatch') === 'nightWatch');
-  const commonRoomMembers = members.filter(([, traveler]) => traveler.location === 'commonRoom');
+
 
   return (
     <section className="signal-room-panel" id="signal-room" aria-label="Signal Room">
@@ -289,19 +273,10 @@ export function SignalRoom({ rates }: { rates: RateSnapshot | null }) {
         {room ? <>
           <div className="room-shared-rate"><div><span className="micro-label">SHARED TARGET</span><strong>{formatRate(room.sharedTarget)} <small>KRW / RM1</small></strong></div><div><span className="micro-label">LATEST RATE</span><strong>{latest ? formatRate(latest.rate) : '—'} <small>KRW / RM1</small></strong></div></div>
           <div className="room-scene">
-            <button type="button" className={`scene-location scene-window ${myLocation === 'nightWatch' ? 'is-active' : ''}`} onClick={() => void moveToLocation('nightWatch')} disabled={locationBusy} aria-pressed={myLocation === 'nightWatch'}>
-              ✦ · · · ✦<small>SEOUL / NIGHT WATCH</small><small>{nightWatchMembers.length} HERE{myLocation === 'nightWatch' ? ' · YOU ARE HERE' : ''}</small>
-            </button>
-            <button type="button" className={`scene-location scene-hearth ${myLocation === 'commonRoom' ? 'is-active' : ''}`} onClick={() => void moveToLocation('commonRoom')} disabled={locationBusy} aria-pressed={myLocation === 'commonRoom'}>
-              ♨<small>COMMON ROOM</small><small>{commonRoomMembers.length} HERE{myLocation === 'commonRoom' ? ' · YOU ARE HERE' : ''}</small>
-            </button>
-            <div className="room-area-travelers night-watch-travelers">{nightWatchMembers.map(([uid, traveler], index) => <div className={`room-traveler traveler-${index % 6}`} key={uid} title={`${traveler.name}${traveler.online ? ' · online' : ' · away'}`}>
+            <div className="room-travelers">{members.map(([uid, traveler], index) => <div className={`room-traveler traveler-${index % 6}`} key={uid} title={`${traveler.name}${traveler.online ? ' · online' : ' · away'}`}>
               <span className="traveler-avatar"><span className="avatar-glyph">{traveler.avatar || avatarFor(index)}</span></span><span className="traveler-name">{traveler.name}</span><i className={traveler.online ? 'online' : ''} />
             </div>)}</div>
-            <div className="room-area-travelers common-room-travelers">{commonRoomMembers.map(([uid, traveler], index) => <div className={`room-traveler traveler-${index % 6}`} key={uid} title={`${traveler.name}${traveler.online ? ' · online' : ' · away'}`}>
-              <span className="traveler-avatar"><span className="avatar-glyph">{traveler.avatar || avatarFor(index)}</span></span><span className="traveler-name">{traveler.name}</span><i className={traveler.online ? 'online' : ''} />
-            </div>)}</div>
-            <span className="scene-caption">CHOOSE A LOCATION · {members.filter(([, traveler]) => traveler.online).length} TRAVELER{members.filter(([, traveler]) => traveler.online).length === 1 ? '' : 'S'} CONNECTED</span>
+            <span className="scene-caption">{members.filter(([, traveler]) => traveler.online).length} TRAVELER{members.filter(([, traveler]) => traveler.online).length === 1 ? '' : 'S'} CONNECTED</span>
           </div>
           <div className="room-controls">
             <p>Propose a shared target change at the roundtable below.</p>
