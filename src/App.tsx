@@ -3,6 +3,7 @@ import { NewsBanner } from './components/NewsBanner';
 import { RateSurveillance } from './components/RateSurveillance';
 import { SignalRoom } from './components/SignalRoom';
 import { ForecastCards } from './components/ForecastCards';
+import { INTRADAY_STALE_MS, quoteTime, useIntradayRate } from './lib/intraday';
 import { fetchNews, isNewsStale, readCachedNews } from './lib/news';
 import { fetchRates, formatObservationDate, formatRate, isRateStale, readCachedRates } from './lib/rates';
 import type { NewsSnapshot, RateSnapshot } from './types';
@@ -16,6 +17,7 @@ function FloatingNote({ className, src }: { className: string; src: string }) {
 }
 
 export default function App() {
+  const intraday = useIntradayRate();
   const [rates, setRates] = useState<RateSnapshot | null>(() => readCachedRates());
   const [news, setNews] = useState<NewsSnapshot | null>(() => readCachedNews());
   const [rateError, setRateError] = useState<string | null>(null);
@@ -64,6 +66,16 @@ export default function App() {
   const newsStale = isNewsStale(news) || Boolean(news?.unavailableMonths?.length);
   const combinedStale = rateStale || newsStale || !rateVerified || Boolean(rateError || newsError);
   const rateStatus = refreshing ? 'CHECKING' : !rates ? 'UNAVAILABLE' : rateStale ? 'OUT OF DATE' : !rateVerified ? 'SAVED DATA' : 'DAILY REFERENCE';
+  const useIntraday = intraday.configured === true;
+  const displayedRate = useIntraday ? intraday.quote?.rate : latest?.rate;
+  const displayedStatus = useIntraday
+    ? intraday.loading ? 'CHECKING' : intraday.error ? 'UNAVAILABLE' : !intraday.quote ? 'WAITING' : intraday.fresh ? 'RECENT QUOTE' : 'OUT OF DATE'
+    : rateStatus;
+  const previousQuote = intraday.previous;
+  const quoteGap = intraday.quote && previousQuote ? Date.parse(intraday.quote.observedAt) - Date.parse(previousQuote.observedAt) : Infinity;
+  const roomRate = useIntraday
+    ? intraday.quote ? { rate: intraday.quote.rate, date: intraday.quote.observedAt, previousRate: quoteGap <= INTRADAY_STALE_MS ? previousQuote?.rate : undefined, fresh: intraday.fresh, source: 'Twelve Data', timeLabel: `${quoteTime(intraday.quote.observedAt)} MYT` } : null
+    : intraday.configured === false && latest ? { ...latest, previousRate: rates?.points.at(-2)?.rate, fresh: rateVerified && !rateStale, source: 'Frankfurter · daily reference', timeLabel: formatObservationDate(latest.date) } : null;
 
   return (
     <>
@@ -83,8 +95,8 @@ export default function App() {
         <a className="brand" href="#top" aria-label="RinggitWon dashboard home"><span className="brand-mark">RW</span><span>RINGGIT<b>WON</b><small>TRAVEL RATE PARTY</small></span></a>
         <a className="top-status" href="#signal-room"><span className="status-led" /> SIGNAL ROOM <span className="top-divider">/</span> MYR → KRW</a>
         <div className="topbar-actions">
-          <button className="refresh-button" type="button" onClick={() => void refresh(true)} disabled={refreshing}>
-            <span className={refreshing ? 'spin' : ''}>↻</span> {refreshing ? 'CHECKING' : 'REFRESH'}
+          <button className="refresh-button" type="button" onClick={() => { void refresh(true); void intraday.refresh(); }} disabled={refreshing || intraday.loading}>
+            <span className={refreshing || intraday.loading ? 'spin' : ''}>↻</span> {refreshing || intraday.loading ? 'CHECKING' : 'REFRESH'}
           </button>
           <button className="theme-toggle" type="button" onClick={() => setTheme((active) => active === 'dark' ? 'light' : 'dark')} aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`} aria-pressed={theme === 'light'}>
             <span aria-hidden="true">{theme === 'dark' ? '☼' : '☾'}</span> {theme === 'dark' ? 'LIGHT' : 'DARK'}
@@ -100,10 +112,12 @@ export default function App() {
           <div className="hero-tags"><span>01 / WATCH</span><a href="#forecast">02 / PLAN</a><a href="#signal-room">03 / HEIST TOGETHER</a></div>
         </div>
         <div className="rate-ticket">
-          <div className="ticket-top"><span>DAILY REFERENCE RATE</span><span className={`live-label ${rateStale || !rateVerified ? 'is-stale' : ''}`}><i /> {rateStatus}</span></div>
-          {latest ? <div className="hero-rate">{formatRate(latest.rate)}<span>KRW</span></div> : <div className="hero-rate hero-rate-wait">—<span>KRW</span></div>}
-          <div className="ticket-bottom"><span>FOR RM 1.00</span><span>{latest ? formatObservationDate(latest.date) : 'WAITING FOR DATA'}</span></div>
-          <p className="chart-caption">Frankfurter · daily reference, not an intraday quote.</p>
+          <div className="ticket-top"><span>{useIntraday ? 'INTRADAY EXCHANGE RATE' : 'DAILY REFERENCE RATE'}</span><span className={`live-label ${(useIntraday ? !intraday.fresh : rateStale || !rateVerified) ? 'is-stale' : ''}`}><i /> {displayedStatus}</span></div>
+          {displayedRate !== undefined ? <div className="hero-rate">{formatRate(displayedRate)}<span>KRW</span></div> : <div className="hero-rate hero-rate-wait">—<span>KRW</span></div>}
+          <div className="ticket-bottom"><span>FOR RM 1.00</span><span>{useIntraday ? intraday.quote ? `${quoteTime(intraday.quote.observedAt)} MYT` : 'WAITING FOR QUOTE' : latest ? formatObservationDate(latest.date) : 'WAITING FOR DATA'}</span></div>
+          <p className="chart-caption">{useIntraday ? <><a href="https://twelvedata.com" target="_blank" rel="noopener noreferrer">Twelve Data</a> · checked every 5 minutes while this page is visible. Time shown is the provider’s quote time.</> : 'Frankfurter · daily reference, not an intraday quote.'}</p>
+          {intraday.error && <p className="chart-caption" role="status">{intraday.error} {intraday.quote ? 'Showing the last quote. ' : ''}Intraday alerts paused.</p>}
+          {useIntraday && intraday.quote && !intraday.fresh && !intraday.error && <p className="chart-caption" role="status">Quote is over 10 minutes old. Intraday alerts paused.</p>}
         </div>
       </section>
 
@@ -121,12 +135,12 @@ export default function App() {
       </section>
 
       <ForecastCards rates={rates} news={news} lastRefresh={lastRefresh} />
-      <SignalRoom rates={rates} />
+      <SignalRoom rate={roomRate} />
       <NewsBanner snapshot={news} stale={Boolean(newsError)} error={newsError} onRefresh={() => void refresh(true)} />
 
       <section className="below-fold-note">
-        <div className="note-mark">!</div><div><strong>Reference rate, not a cash exchange quote.</strong><p>Rate data comes from daily central-bank and official-source observations. The rate may differ from what a bank, money changer, or transfer service offers.</p></div>
-        <span className={`freshness ${combinedStale ? 'is-stale' : ''}`}><i />{combinedStale ? 'CHECK DATA' : 'SOURCES READY'}</span>
+        <div className="note-mark">!</div><div><strong>Indicative rates, not a cash exchange quote.</strong><p>Charts and forecasts use daily reference observations. {useIntraday ? 'The main quote and room use Twelve Data. ' : ''}Rates may differ from what a bank, money changer, or transfer service offers.</p></div>
+        <span className={`freshness ${combinedStale || Boolean(intraday.error) || (useIntraday && !intraday.fresh) ? 'is-stale' : ''}`}><i />{combinedStale || Boolean(intraday.error) || (useIntraday && !intraday.fresh) ? 'CHECK DATA' : 'SOURCES READY'}</span>
       </section>
       <footer className="footer"><span>RINGGITWON // DEMO BUILD</span><span>{rates?.points.length ?? 0} OBSERVATIONS CACHED</span></footer>
       </main>

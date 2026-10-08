@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import type { Database } from 'firebase/database';
-import type { RateSnapshot } from '../types';
 import { connectFirebaseMember, firebaseConfigured } from '../lib/firebase';
 import {
   avatarFor, createRoom, dismissRoom, joinRoom, publishRateCrossing, sendTestAlert, subscribeRoom,
@@ -16,7 +15,9 @@ function defaultName(): string {
   catch { return ''; }
 }
 
-export function SignalRoom({ rates }: { rates: RateSnapshot | null }) {
+type RoomRate = { rate: number; date: string; previousRate?: number; fresh: boolean; source: string; timeLabel: string };
+
+export function SignalRoom({ rate: latest }: { rate: RoomRate | null }) {
   const [name, setName] = useState(defaultName);
   const [avatarIndex, setAvatarIndex] = useState(0);
   const [targetInput, setTargetInput] = useState('350');
@@ -36,8 +37,6 @@ export function SignalRoom({ rates }: { rates: RateSnapshot | null }) {
   const seenRound = useRef<string | null>(null);
   const alreadyPlayedAlert = useRef<string | null>(null);
   const audioContext = useRef<AudioContext | null>(null);
-  const latest = rates?.points.at(-1);
-  const previous = rates?.points.at(-2);
 
   useEffect(() => {
     if (!database || !member || !roomCode) return;
@@ -90,19 +89,19 @@ export function SignalRoom({ rates }: { rates: RateSnapshot | null }) {
   }, [room?.roundtable?.id, Boolean(room), notificationPermission]);
 
   useEffect(() => {
-    if (!database || !member || !roomCode || !room || !latest) return;
-    void publishRateCrossing(database, roomCode, member.name, room.sharedTarget, latest.date, previous?.rate, latest.rate)
+    if (!database || !member || !roomCode || !room || !latest?.fresh) return;
+    void publishRateCrossing(database, roomCode, member.name, room.sharedTarget, latest.date, latest.previousRate, latest.rate)
       .catch((nextError: unknown) => setError(nextError instanceof Error ? nextError.message : 'Could not publish the rate alert.'));
-  }, [database, latest?.date, latest?.rate, member, previous?.rate, room?.sharedTarget, roomCode]);
+  }, [database, latest?.date, latest?.rate, latest?.fresh, latest?.previousRate, member, room?.sharedTarget, roomCode]);
 
   useEffect(() => {
-    if (room?.alert?.kind !== 'rate' || !latest || latest.rate < room.sharedTarget) return;
+    if (room?.alert?.kind !== 'rate' || !latest?.fresh || latest.rate < room.sharedTarget) return;
     const timer = window.setInterval(() => {
       setRepeatPings((count) => count + 1);
       if ('vibrate' in navigator) navigator.vibrate([120, 70, 120]);
     }, 90 * 60 * 1000);
     return () => window.clearInterval(timer);
-  }, [latest?.rate, room?.alert?.id, room?.alert?.kind, room?.sharedTarget]);
+  }, [latest?.rate, latest?.fresh, room?.alert?.id, room?.alert?.kind, room?.sharedTarget]);
 
   async function enterRoom(action: 'create' | 'join') {
     const trimmedName = name.trim().slice(0, 20);
@@ -272,6 +271,7 @@ export function SignalRoom({ rates }: { rates: RateSnapshot | null }) {
         <div className="room-live-top"><div><span className="micro-label">ROOM NUMBER</span><strong className="room-code">{roomCode}</strong><span className="room-role">{isMaster ? 'ROOM MASTER' : 'CREW MEMBER'}</span></div><div className="room-live-actions">{isMaster && <button type="button" className="room-dismiss" onClick={() => void dismissCurrentRoom()} disabled={busy}>DISMISS ROOM</button>}<button type="button" className="room-leave" onClick={leaveRoom}>LEAVE ROOM</button></div></div>
         {room ? <>
           <div className="room-shared-rate"><div><span className="micro-label">SHARED TARGET</span><strong>{formatRate(room.sharedTarget)} <small>KRW / RM1</small></strong></div><div><span className="micro-label">LATEST RATE</span><strong>{latest ? formatRate(latest.rate) : '—'} <small>KRW / RM1</small></strong></div></div>
+          <p className="chart-caption">{latest ? <>{latest.source === 'Twelve Data' ? <a href="https://twelvedata.com" target="_blank" rel="noopener noreferrer">Twelve Data</a> : latest.source} · {latest.timeLabel}</> : 'Waiting for a verified rate source.'} {!latest?.fresh && 'Automatic rate alerts paused.'}</p>
           <div className="room-scene">
             <div className="room-travelers">{members.map(([uid, traveler], index) => <div className={`room-traveler traveler-${index % 6}`} key={uid} title={`${traveler.name}${traveler.online ? ' · online' : ' · away'}`}>
               <span className="traveler-avatar"><span className="avatar-glyph">{traveler.avatar || avatarFor(index)}</span></span><span className="traveler-name">{traveler.name}</span><i className={traveler.online ? 'online' : ''} />

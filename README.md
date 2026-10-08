@@ -13,6 +13,20 @@ npm run dev
 
 Open `http://127.0.0.1:5173`. The port is fixed; Vite stops with an error if another process occupies it. The dashboard fetches the latest available observations and headline links when it opens, when Refresh is pressed, and about hourly while the page is visible. It keeps the last successful response in this browser if a refresh fails. The dashboard marks that response as saved data and shows its last successful fetch time separately from the rate observation date. A refresh attempt does not advance that fetch timestamp. These are daily reference rates, so they can differ from intraday Google Finance or Apple Stocks quotes.
 
+## Optional Twelve Data intraday quote
+
+The local development/preview server supports a server-side Twelve Data quote for `MYR/KRW`. To activate it:
+
+1. Obtain a [Twelve Data API key](https://twelvedata.com/forex) and confirm your account can access `MYR/KRW` through the exchange-rate endpoint. Pair access has not yet been verified for this project.
+2. Add `TWELVE_DATA_API_KEY=your_key_here` to your existing, ignored `.env.local`. Keep the Firebase settings. Do **not** prefix this key with `VITE_` or paste it into browser code.
+3. Restart `npm run dev`. The main ticket should say **INTRADAY EXCHANGE RATE**, show Twelve Data attribution, and show its quote timestamp in MYT. Rejected credentials, unsupported pair/plan access, and provider failures show an unavailable state.
+
+The browser checks every five minutes while visible. `/api/intraday-rate` fetches only the fixed pair, coalesces concurrent requests, and caches successful and failed attempts for five minutes per server process. Refresh respects this cache. This is approximately 288 upstream calls per day for one continuously used process; restarts and multiple instances can increase usage. With no key, the app continues to use clearly labeled daily reference data.
+
+The main quote and Signal Room use Twelve Data when configured. Quotes older than ten minutes or a failed refresh pause automatic rate alerts; the last quote stays visible with its timestamp. Crossings require two recent observations received during this visit; the first fetch does not invent a previous quote. Charts and forecasts continue to use Frankfurter daily history, without mixing in intraday observations. Browser polling is not 24/7 background monitoring and can miss crossings between polls.
+
+This route runs with `npm run dev` and `npm run preview`; it is **not included as a backend in the static `dist` output**. Public hosting needs a server/serverless route with this secret and shared caching. Vite preview is for local previews, not a production server. Before public display, confirm the required plan/redistribution rights with Twelve Data; [its terms](https://twelvedata.com/terms) and [attribution guidelines](https://support.twelvedata.com/en/articles/12647398-attribution-guidelines-for-using-twelve-data) apply. Attribution alone does not grant display rights. No paid plan or deployment has been provisioned.
+
 ## Enable Signal Rooms
 
 Room syncing uses Firebase Anonymous Authentication and Realtime Database on the no-cost Spark plan. To enable it:
@@ -28,6 +42,7 @@ Without those settings, the app explains what is needed and keeps the room actio
 ## Data sources
 
 - [Frankfurter](https://frankfurter.dev/) for daily reference rates and rate history.
+- [Twelve Data](https://twelvedata.com/) for an optional intraday quote (requires server-side configuration and account access).
 - [GDELT DOC](https://blog.gdeltproject.org/gdelt-doc-2-0-api-debuts/) for recent headline links.
 
 The chart and forecasts are informational and do not guarantee an exchange outcome. This project does not exchange money.
