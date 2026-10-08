@@ -36,24 +36,26 @@ export function newsSignal(articles: Headline[]) {
   return { dailyAdjustment: Math.max(-0.00005, Math.min(0.00005, score * 0.00001)), articles: relevant.slice(0, 3), matches: scored.filter(row => row.score !== 0).length };
 }
 
-export function estimateForecast(points: RatePoint[], target: number, articles: Headline[], now = Date.now()) {
+export function estimateForecast(points: RatePoint[], target: number, articles: Headline[], now = Date.now(), options: { years?: number; weekdaysOnly?: boolean } = {}) {
   if (!Number.isFinite(target) || target <= 0) throw new Error('Enter a target greater than zero.');
   const today = Math.floor((now + 8 * 3_600_000) / DAY);
   const yearStart = new Date(today * DAY);
-  yearStart.setUTCFullYear(yearStart.getUTCFullYear() - 1);
+  yearStart.setUTCFullYear(yearStart.getUTCFullYear() - (options.years ?? 1));
   const firstDay = yearStart.getTime() / DAY;
-  const history = [...new Map(points.filter(p => Number.isFinite(p.rate) && p.rate > 0 && /^\d{4}-\d{2}-\d{2}$/.test(p.date) && Date.parse(p.date) / DAY >= firstDay && Date.parse(p.date) / DAY <= today).map(p => [p.date, p])).values()].sort((a, b) => a.date.localeCompare(b.date));
+  const history = [...new Map(points.filter(p => Number.isFinite(p.rate) && p.rate > 0 && /^\d{4}-\d{2}-\d{2}$/.test(p.date) && Date.parse(p.date) / DAY >= firstDay && Date.parse(p.date) / DAY <= today && (!options.weekdaysOnly || ![0, 6].includes(new Date(p.date).getUTCDay()))).map(p => [p.date, p])).values()].sort((a, b) => a.date.localeCompare(b.date));
   if (history.length < MIN_OBSERVATIONS) throw new Error('At least 60 historical observations are needed. Refresh history to calculate.');
-  // Match calendar-day returns to their ending weekday. A Friday–Monday gap
-  // is not a one-day return; exclude it rather than inventing weekend prices.
+  // Match returns to their ending weekday. Calendar mode excludes all gaps;
+  // weekday-close mode accepts Friday–Monday as one trading-session return.
   const returnsByWeekday: number[][] = Array.from({ length: 7 }, () => []);
   let excludedGaps = 0;
   history.slice(1).forEach((point, i) => {
-    if (Date.parse(point.date) - Date.parse(history[i].date) !== DAY) { excludedGaps++; return; }
+    const gap = Date.parse(point.date) - Date.parse(history[i].date);
+    const normalWeekend = options.weekdaysOnly && gap === 3 * DAY && new Date(point.date).getUTCDay() === 1;
+    if (gap !== DAY && !normalWeekend) { excludedGaps++; return; }
     returnsByWeekday[new Date(point.date).getUTCDay()].push(Math.log(point.rate / history[i].rate));
   });
-  if (returnsByWeekday.some(pool => pool.length < MIN_WEEKDAY_RETURNS)) {
-    throw new Error('Forecast unavailable: history needs at least 8 consecutive-day changes for each day of the week. Refresh history; missing dates are not filled.');
+  if (returnsByWeekday.some((pool, day) => !(options.weekdaysOnly && (day === 0 || day === 6)) && pool.length < MIN_WEEKDAY_RETURNS)) {
+    throw new Error('Forecast unavailable: history needs at least 8 valid changes for each modeled weekday. Refresh history; missing dates are not filled.');
   }
   const returns = returnsByWeekday.flat();
   const mean = returns.reduce((sum, value) => sum + value, 0) / returns.length;
@@ -72,11 +74,11 @@ export function estimateForecast(points: RatePoint[], target: number, articles: 
     for (let day = observedDay + 1; day <= windows[2].end; day++) {
       const weekday = new Date(day * DAY).getUTCDay();
       const pool = returnsByWeekday[weekday];
-      // Advance every calendar day using that weekday's observed changes.
+      // Calendar mode advances daily; weekday-close mode carries weekends flat.
       // Keep the existing news heuristic limited to weekdays; its effect is
       // unvalidated and decays across 14 calendar days.
       const newsAdjustment = weekday !== 0 && weekday !== 6 ? signal.dailyAdjustment * Math.max(0, 1 - (day - today) / 14) : 0;
-      rate *= Math.exp(pool[Math.floor(random() * pool.length)] + newsAdjustment);
+      if (!(options.weekdaysOnly && (weekday === 0 || weekday === 6))) rate *= Math.exp(pool[Math.floor(random() * pool.length)] + newsAdjustment);
       windows.forEach((window, index) => { if (day >= window.start && day <= window.end && rate >= target) touched[index] = true; });
     }
     touched.forEach((hit, index) => { if (hit) hits[index]++; });
