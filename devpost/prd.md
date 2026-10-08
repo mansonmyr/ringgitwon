@@ -62,7 +62,7 @@ Source: learner feedback after the first dashboard preview.
 
 - Present a proposed target, the person who raised it, the chosen duration, remaining time, party members, and each member’s card choice.
 - Each member starts with Follow (agree) and Fold (disagree) cards and can draw/play a third Hold card (abstain/not ready).
-- At the end of the set duration, members who have not responded count as Hold.
+- At the end of the set duration, members who have not responded count as Hold. The room master must be connected to finalize and apply the result; otherwise the table shows that it is waiting for the master.
 
 Source: `scope.md > The POC Boundary` and `The Unique Kernel`.
 

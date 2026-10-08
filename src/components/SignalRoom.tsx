@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
-import type { FormEvent } from 'react';
 import type { Database } from 'firebase/database';
 import type { RateSnapshot } from '../types';
 import { connectFirebaseMember, firebaseConfigured } from '../lib/firebase';
 import {
-  avatarFor, createRoom, dismissRoom, joinRoom, publishRateCrossing, sendTestAlert, setRoomLocation, subscribeRoom, updateSharedTarget,
+  avatarFor, createRoom, dismissRoom, joinRoom, publishRateCrossing, sendTestAlert, setRoomLocation, subscribeRoom,
 } from '../lib/rooms';
 import type { RoomData, RoomIdentity, RoomLocation } from '../lib/rooms';
 import { formatRate } from '../lib/rates';
+import { Roundtable } from './Roundtable';
 
 const AVATARS = ['🕵️', '🧙', '🦊', '🐈', '🦉', '🦝'];
 
@@ -34,6 +34,7 @@ export function SignalRoom({ rates }: { rates: RateSnapshot | null }) {
   );
   const [notificationMessage, setNotificationMessage] = useState('');
   const seenAlert = useRef<string | null>(null);
+  const seenRound = useRef<string | null>(null);
   const alreadyPlayedAlert = useRef<string | null>(null);
   const audioContext = useRef<AudioContext | null>(null);
   const latest = rates?.points.at(-1);
@@ -71,6 +72,23 @@ export function SignalRoom({ rates }: { rates: RateSnapshot | null }) {
       }
     }
   }, [notificationPermission, room?.alert?.id]);
+
+  useEffect(() => {
+    if (!room) return;
+    const proposal = room.roundtable;
+    if (seenRound.current === null) { seenRound.current = proposal?.id ?? ''; return; }
+    if (!proposal || seenRound.current === proposal.id) return;
+    seenRound.current = proposal.id;
+    playAlertSound();
+    if (notificationPermission === 'granted') {
+      try {
+        new Notification('Signal Room · roundtable called', {
+          body: `${proposal.proposerName} proposes ${formatRate(proposal.target)} KRW / RM1. Play your card.`,
+          tag: proposal.id,
+        });
+      } catch { /* The roundtable remains visible in the room. */ }
+    }
+  }, [room?.roundtable?.id, Boolean(room), notificationPermission]);
 
   useEffect(() => {
     if (!database || !member || !roomCode || !room || !latest) return;
@@ -124,20 +142,6 @@ export function SignalRoom({ rates }: { rates: RateSnapshot | null }) {
     } finally {
       setBusy(false);
     }
-  }
-
-  async function saveTarget(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (!database || !room || !isMaster) return;
-    const target = Number(targetInput);
-    if (!Number.isFinite(target) || target <= 0) { setError('Enter a target rate greater than zero.'); return; }
-    setBusy(true);
-    setError('');
-    try {
-      await updateSharedTarget(database, roomCode, target);
-    } catch (nextError) {
-      setError(nextError instanceof Error ? nextError.message : 'Could not update the shared target.');
-    } finally { setBusy(false); }
   }
 
   async function testAlert() {
@@ -223,6 +227,7 @@ export function SignalRoom({ rates }: { rates: RateSnapshot | null }) {
     setDatabase(null);
     setRepeatPings(0);
     seenAlert.current = null;
+    seenRound.current = null;
     setError('');
   }
 
@@ -299,13 +304,14 @@ export function SignalRoom({ rates }: { rates: RateSnapshot | null }) {
             <span className="scene-caption">CHOOSE A LOCATION · {members.filter(([, traveler]) => traveler.online).length} TRAVELER{members.filter(([, traveler]) => traveler.online).length === 1 ? '' : 'S'} CONNECTED</span>
           </div>
           <div className="room-controls">
-            {isMaster ? <form onSubmit={(event) => void saveTarget(event)}><label>UPDATE SHARED TARGET<input inputMode="decimal" type="number" min="0.001" step="0.001" value={targetInput} onChange={(event) => setTargetInput(event.target.value)} /></label><button type="submit" disabled={busy}>SET TARGET</button></form> : <p>The room master controls the shared target.</p>}
+            <p>Propose a shared target change at the roundtable below.</p>
             <button type="button" className="test-alert-button" onClick={() => void testAlert()} disabled={busy}>⚡ TEST ALERT · BUZZ THE ROOM</button>
             <button type="button" className="room-notification-button" onClick={() => void enableBrowserAlerts()}>{notificationPermission === 'granted' ? 'BROWSER ALERTS ON' : 'ENABLE BROWSER ALERTS'}</button>
           </div>
           {notificationMessage && <p className="room-notification-message" role="status">{notificationMessage}</p>}
           {room.alert && <div className="party-alert" role="status" key={room.alert.id}><span className="alert-signal">PING</span><div><strong>{room.alert.message}</strong><small>{room.alert.kind === 'test' ? 'TEST ALERT' : `RATE REACHED · ${room.alert.rateDate ?? ''}`}</small></div></div>}
           {repeatPings > 0 && <p className="repeat-ping">PING {repeatPings + 1} · Rate remains above the shared target.</p>}
+          {database && member && <Roundtable database={database} code={roomCode} identity={member} room={room} />}
         </> : <div className="room-wait">CONNECTING TO ROOM SIGNAL…</div>}
         {error && <div className="room-error" role="alert">{error}</div>}
       </div>}

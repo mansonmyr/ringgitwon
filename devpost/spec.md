@@ -121,7 +121,7 @@ Implements `prd.md > Party Rooms and Avatars`.
 
 ### Roundtable
 
-Writes the proposal, duration/deadline, and each member's Follow/Fold/Hold choice to the room. Connected clients observe the same round. At expiry, a client transaction resolves the round once: Follow greater than Fold changes the target, Fold greater than Follow keeps it, a tie waits for the raiser's extend/close choice, and all Hold prompts a revote. Only connected in-app participants are notified.
+Writes the proposal, duration/deadline, and each member's Follow/Fold/Hold choice to the room. Connected clients observe the same round. At expiry, the connected room master reads server-frozen ballots and uses a transaction to resolve the round once: Follow greater than Fold changes the target, Fold greater than Follow keeps it, a tie waits for the raiser's extend/close choice, and all Hold prompts a revote. Only connected in-app participants are notified.
 
 Implements `prd.md > Roundtable Target Changes`.
 
@@ -270,3 +270,5 @@ The learner asked whether free live rates could come from Wise, Google, Yahoo Fi
 - Anonymous room rules and client-resolved voting are suitable only for the proof of concept. Server-validated authorization, abuse prevention, data retention policy, broader access, and licensed market data must be designed before relying on this as a production service for the public.
 
 - Forecast implementation uses approximately one year of history, a minimum of 60 observations, 2,000 deterministic bootstrap paths, and a directional English-headline adjustment capped at ±0.005% daily that fades over 14 calendar days. Other languages remain in the feed and have neutral model influence. Method limitations are disclosed beside the cards.
+
+- Roundtable implementation: ballots live separately from proposal metadata, each writable only by its authenticated member before the server-enforced deadline. The existing room master remains the trusted finalizer; if disconnected, finalization waits for it to rejoin. Accepted targets and the applied flag update atomically. Firebase rules cannot aggregate arbitrary ballot maps, so this client-only demo does not claim independent server verification of the master’s tally. Voting duration is 15 seconds–24 hours. New arrivals may vote while the table is open; existing ballots remain counted after a member disconnects.

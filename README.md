@@ -44,4 +44,12 @@ Set a personal target in the Plan section. Three cards use 2,000 simulated paths
 
 ## Remaining build work
 
-The timed Follow/Fold/Hold roundtable and final end-to-end review remain unfinished. Browser notifications require an open, connected page; closed-app push and continuous server monitoring are not implemented.
+The roundtable is implemented locally; publish the updated database.rules.json before using it. Multi-client roundtable verification and the final end-to-end review remain unfinished. Browser notifications require an open, connected page; closed-app push and continuous server monitoring are not implemented.
+
+## Target roundtable
+
+Any room member can propose a target and choose 0.25–1,440 voting minutes (15 seconds–24 hours). Follow agrees, Fold disagrees, and Hold abstains. Unanswered cards count as Hold when the deadline passes. Follow majority applies the target; Fold majority leaves it unchanged. A tie lets the proposer extend by the original duration or close the table. All-Hold prompts each traveler for a re-vote preference; any member can then raise a fresh round.
+
+Publish the complete local `database.rules.json` in Firebase Console → Realtime Database → Rules → Publish. These rules protect each member's ballot and enforce voting deadlines using Firebase server time. The room master's connected browser remains the trusted authority for counting frozen ballots and applying the result. If the master disconnects, finalization waits until that same anonymous identity rejoins. This demo does not have a trusted server tally or a background worker.
+
+Round metadata is stored at `rooms/{code}/roundtable`; ballots and re-vote preferences are stored by round ID under the same room. Dismiss Room deletes all of them with the room. Target application and its completion flag are saved atomically. A failed application can be retried without creating a new vote.

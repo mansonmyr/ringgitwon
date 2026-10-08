@@ -7,25 +7,111 @@
         ".read": "auth != null",
         ".write": "auth != null && ((!data.exists() && $roomCode.matches(/^[0-9]{6}$/) && newData.child('masterUid').val() === auth.uid) || (data.exists() && data.child('masterUid').val() === auth.uid && !newData.exists()))",
         "sharedTarget": {
-          ".write": "auth != null && root.child('rooms').child($roomCode).child('masterUid').val() === auth.uid",
+          ".write": "auth != null && root.child('rooms').child($roomCode).child('masterUid').val() === auth.uid && root.child('rooms').child($roomCode).child('roundtable/status').val() === 'accepted' && root.child('rooms').child($roomCode).child('roundtable/applied').val() === false && newData.val() === root.child('rooms').child($roomCode).child('roundtable/target').val() && newData.parent().child('roundtable/applied').val() === true",
           ".validate": "newData.isNumber() && newData.val() > 0"
         },
         "members": {
           "$uid": {
             ".write": "auth != null && auth.uid === $uid && root.child('rooms').child($roomCode).child('masterUid').exists()",
             ".validate": "newData.hasChildren(['name', 'avatar', 'online'])",
-            "name": { ".validate": "newData.isString() && newData.val().length <= 20" },
-            "avatar": { ".validate": "newData.isString() && newData.val().length <= 12" },
-            "online": { ".validate": "newData.isBoolean()" },
-            "location": { ".validate": "newData.val() === 'nightWatch' || newData.val() === 'commonRoom'" },
-            "joinedAt": { ".validate": "newData.isNumber()" }
+            "name": {
+              ".validate": "newData.isString() && newData.val().length <= 20"
+            },
+            "avatar": {
+              ".validate": "newData.isString() && newData.val().length <= 12"
+            },
+            "online": {
+              ".validate": "newData.isBoolean()"
+            },
+            "location": {
+              ".validate": "newData.val() === 'nightWatch' || newData.val() === 'commonRoom'"
+            },
+            "joinedAt": {
+              ".validate": "newData.isNumber()"
+            }
           }
         },
         "alert": {
           ".write": "auth != null && root.child('rooms').child($roomCode).child('members').child(auth.uid).exists()",
           ".validate": "newData.hasChildren(['id', 'kind', 'from', 'message', 'createdAt'])",
-          "kind": { ".validate": "newData.val() === 'test' || newData.val() === 'rate'" },
-          "createdAt": { ".validate": "newData.isNumber()" }
+          "kind": {
+            ".validate": "newData.val() === 'test' || newData.val() === 'rate'"
+          },
+          "createdAt": {
+            ".validate": "newData.isNumber()"
+          }
+        },
+        ".validate": "newData.hasChildren(['masterUid','sharedTarget','createdAt','members']) && (data.exists() || (!newData.child('roundtable').exists() && !newData.child('ballots').exists() && !newData.child('revotes').exists()))",
+        "masterUid": {
+          ".validate": "newData.isString() && (!data.exists() || newData.val() === data.val())"
+        },
+        "createdAt": {
+          ".validate": "newData.isNumber() && (!data.exists() || newData.val() === data.val())"
+        },
+        "roundtable": {
+          ".write": "auth != null && root.child('rooms').child($roomCode).child('members').child(auth.uid).exists() && newData.exists() && (((!data.exists() || data.child('status').val() === 'closed' || data.child('status').val() === 'rejected' || data.child('status').val() === 'allHold' || (data.child('status').val() === 'accepted' && data.child('applied').val() === true)) && newData.child('id').val() !== data.child('id').val() && !root.child('rooms').child($roomCode).child('ballots').child(newData.child('id').val()).exists() && !root.child('rooms').child($roomCode).child('revotes').child(newData.child('id').val()).exists() && newData.child('proposerUid').val() === auth.uid && newData.child('proposerName').val() === root.child('rooms').child($roomCode).child('members').child(auth.uid).child('name').val() && newData.child('status').val() === 'open' && newData.child('applied').val() === false && newData.child('follow').val() === 0 && newData.child('fold').val() === 0 && newData.child('deadline').val() > now && newData.child('deadline').val() <= now + newData.child('durationMs').val() + 10000) || (newData.child('id').val() === data.child('id').val() && newData.child('proposerUid').val() === data.child('proposerUid').val() && newData.child('proposerName').val() === data.child('proposerName').val() && newData.child('target').val() === data.child('target').val() && newData.child('durationMs').val() === data.child('durationMs').val() && ((auth != null && root.child('rooms').child($roomCode).child('masterUid').val() === auth.uid && data.child('status').val() === 'open' && now >= data.child('deadline').val() && newData.child('deadline').val() === data.child('deadline').val() && newData.child('applied').val() === false && ((newData.child('follow').val() > newData.child('fold').val() && newData.child('status').val() === 'accepted') || (newData.child('fold').val() > newData.child('follow').val() && newData.child('status').val() === 'rejected') || (newData.child('follow').val() === newData.child('fold').val() && ((newData.child('follow').val() === 0 && newData.child('status').val() === 'allHold') || (newData.child('follow').val() > 0 && newData.child('status').val() === 'tie'))))) || (data.child('proposerUid').val() === auth.uid && (data.child('status').val() === 'tie' || data.child('status').val() === 'allHold') && newData.child('follow').val() === data.child('follow').val() && newData.child('fold').val() === data.child('fold').val() && newData.child('applied').val() === data.child('applied').val() && ((newData.child('status').val() === 'open' && newData.child('deadline').val() > now && newData.child('deadline').val() <= now + newData.child('durationMs').val() + 10000) || (newData.child('status').val() === 'closed' && newData.child('deadline').val() === data.child('deadline').val()))) || (auth != null && root.child('rooms').child($roomCode).child('masterUid').val() === auth.uid && data.child('status').val() === 'accepted' && data.child('applied').val() === false && newData.child('applied').val() === true && newData.child('status').val() === data.child('status').val() && newData.child('deadline').val() === data.child('deadline').val() && newData.child('follow').val() === data.child('follow').val() && newData.child('fold').val() === data.child('fold').val() && newData.parent().child('sharedTarget').val() === newData.child('target').val()))))",
+          ".validate": "newData.hasChildren(['id','proposerUid','proposerName','target','durationMs','deadline','status','applied','follow','fold'])",
+          "id": {
+            ".validate": "newData.isString() && newData.val().matches(/^[a-zA-Z0-9-]{36}$/)"
+          },
+          "proposerUid": {
+            ".validate": "newData.isString()"
+          },
+          "proposerName": {
+            ".validate": "newData.isString() && newData.val().length <= 20"
+          },
+          "target": {
+            ".validate": "newData.isNumber() && newData.val() > 0"
+          },
+          "durationMs": {
+            ".validate": "newData.isNumber() && newData.val() >= 15000 && newData.val() <= 86400000"
+          },
+          "deadline": {
+            ".validate": "newData.isNumber()"
+          },
+          "status": {
+            ".validate": "newData.val() === 'open' || newData.val() === 'accepted' || newData.val() === 'rejected' || newData.val() === 'tie' || newData.val() === 'allHold' || newData.val() === 'closed'"
+          },
+          "applied": {
+            ".validate": "newData.isBoolean()"
+          },
+          "follow": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() % 1 === 0"
+          },
+          "fold": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() % 1 === 0"
+          },
+          "$other": {
+            ".validate": false
+          }
+        },
+        "ballots": {
+          "$roundId": {
+            "$uid": {
+              ".write": "auth != null && root.child('rooms').child($roomCode).child('members').child(auth.uid).exists() && auth.uid === $uid && newData.exists() && root.child('rooms').child($roomCode).child('roundtable/id').val() === $roundId && root.child('rooms').child($roomCode).child('roundtable/status').val() === 'open' && now < root.child('rooms').child($roomCode).child('roundtable/deadline').val()",
+              ".validate": "newData.hasChildren(['choice','name','avatar'])",
+              "choice": {
+                ".validate": "newData.val() === 'follow' || newData.val() === 'fold' || newData.val() === 'hold'"
+              },
+              "name": {
+                ".validate": "newData.val() === root.child('rooms').child($roomCode).child('members').child($uid).child('name').val()"
+              },
+              "avatar": {
+                ".validate": "newData.val() === root.child('rooms').child($roomCode).child('members').child($uid).child('avatar').val()"
+              },
+              "$other": {
+                ".validate": false
+              }
+            }
+          }
+        },
+        "revotes": {
+          "$roundId": {
+            "$uid": {
+              ".write": "auth != null && root.child('rooms').child($roomCode).child('members').child(auth.uid).exists() && auth.uid === $uid && newData.exists() && root.child('rooms').child($roomCode).child('roundtable/id').val() === $roundId && root.child('rooms').child($roomCode).child('roundtable/status').val() === 'allHold'",
+              ".validate": "newData.val() === 'yes' || newData.val() === 'no'"
+            }
+          }
         }
       }
     }

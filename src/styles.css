@@ -134,3 +134,20 @@ body, body button:not(:disabled), body a[href], body [role="button"], body input
 .forecast-card small { display: block; font: 9px/1.6 var(--mono); color: #8ca3b0; margin-top: 16px; }
 .forecast-method { color: #b4c3ca; font-size: 12px; line-height: 1.6; }.forecast-method summary { color: var(--cyan); }
 @media (max-width: 740px) { .forecast-grid { grid-template-columns: 1fr; }.forecast-panel { padding: 18px; } }
+
+.roundtable { margin-top: 24px; padding: 20px; border: 1px solid #526e69; background: #111d24; }
+.roundtable-heading, .roundtable-proposal { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
+.roundtable-heading h3 { margin: 7px 0; font-size: 23px; }.roundtable-help { color: #9db2ba; font-size: 12px; line-height: 1.6; }
+.roundtable-proposal { padding: 14px 0; font: 10px var(--mono); }.roundtable-proposal strong { color: var(--mint); font-size: 22px; }.roundtable-proposal small { font-size: 9px; }.roundtable-proposal time { color: var(--gold); }
+.poker-table { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; padding: 30px 18px; border: 5px double #607e6c; border-radius: 70px; background: radial-gradient(ellipse, #21483f, #132c28); }
+.table-seat { display: grid; justify-items: center; gap: 7px; min-width: 70px; }.table-seat .avatar-glyph { font-size: 26px; }.table-seat strong { font: 10px var(--mono); }
+.played-card { padding: 8px; background: #14242b; border: 1px solid #607e6c; font: 10px var(--mono); }
+.roundtable-score, .roundtable-result { text-align: center; font: 11px/1.7 var(--mono); }.roundtable-result { color: var(--gold); }
+.vote-hand { display: flex; gap: 12px; justify-content: center; align-items: center; flex-wrap: wrap; margin: 20px 0; }
+.roundtable .vote-card { display: grid; gap: 8px; padding: 14px; min-width: 92px; border: 2px solid #506573; border-radius: 7px; background: #1d2b35; font: 12px var(--mono); transform: rotate(-3deg); transition: transform .15s; }.vote-card span { font-size: 27px; }.vote-card small { font-size: 9px; }
+.roundtable .vote-card:nth-child(2) { transform: rotate(3deg); }.roundtable .vote-card[aria-pressed="true"] { border-color: var(--mint); transform: translateY(-8px); box-shadow: 0 5px 0 #080e14; }
+.vote-follow { color: var(--mint); }.vote-fold { color: #ffba9b; }.vote-hold { color: #d1c2eb; }
+.roundtable button:not(.vote-card) { padding: 10px 12px; color: var(--mint); background: #1b302e; border: 1px solid #59736b; font: 10px var(--mono); }.roundtable button:disabled { opacity: .5; }.roundtable button[aria-pressed="true"] { border-color: var(--cyan); }
+.roundtable-form, .roundtable-actions { display: flex; align-items: end; gap: 12px; flex-wrap: wrap; margin-top: 18px; }.roundtable-form label { display: grid; gap: 7px; color: #adbdc4; font: 10px var(--mono); }.roundtable-form input { width: 160px; max-width: 100%; padding: 10px; background: #111923; border: 1px solid #485d66; color: var(--mint); font: 14px var(--mono); }
+.revote-prompt { color: #adbdc4; font-size: 12px; }.revote-prompt button { margin-right: 8px; }
+@media(max-width:450px) { .roundtable { padding: 12px; }.poker-table { gap: 12px; padding: 20px 8px; border-radius: 30px; }.roundtable .vote-card { min-width: 75px; padding: 10px; } }

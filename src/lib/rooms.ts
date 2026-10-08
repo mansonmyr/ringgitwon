@@ -2,6 +2,7 @@ import {
   get, onDisconnect, onValue, ref, remove, runTransaction, set,
 } from 'firebase/database';
 import type { DataSnapshot, Database } from 'firebase/database';
+import type { Round, Ballot } from './roundtable';
 
 export type RoomMember = {
   name: string;
@@ -28,6 +29,9 @@ export type RoomData = {
   createdAt: number;
   members: Record<string, RoomMember>;
   alert?: RoomAlert | null;
+  roundtable?: Round;
+  ballots?: Record<string, Record<string, Ballot>>;
+  revotes?: Record<string, Record<string, 'yes' | 'no'>>;
 };
 
 export type RoomIdentity = { uid: string; name: string; avatar: string };
@@ -146,10 +150,6 @@ export async function publishRateCrossing(
       rateDate,
     } satisfies RoomAlert;
   }, { applyLocally: false });
-}
-
-export async function updateSharedTarget(database: Database, code: string, target: number): Promise<void> {
-  await set(ref(database, `${ROOM_ROOT}/${code}/sharedTarget`), target);
 }
 
 export async function dismissRoom(database: Database, code: string): Promise<void> {
