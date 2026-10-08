@@ -21,6 +21,7 @@ export default function App() {
   const [rateError, setRateError] = useState<string | null>(null);
   const [newsError, setNewsError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [rateVerified, setRateVerified] = useState(false);
   const [lastRefresh, setLastRefresh] = useState<string | null>(null);
   const [theme, setTheme] = useState<Theme>(() => {
     try { return localStorage.getItem(THEME_KEY) === 'light' ? 'light' : 'dark'; }
@@ -34,12 +35,10 @@ export default function App() {
 
   const refresh = useCallback(async (forceNews = false) => {
     setRefreshing(true);
-    setRateError(null);
-    setNewsError(null);
     const [rateResult, newsResult] = await Promise.allSettled([fetchRates(), fetchNews(forceNews)]);
-    if (rateResult.status === 'fulfilled') setRates(rateResult.value);
-    else setRateError(rateResult.reason instanceof Error ? rateResult.reason.message : 'Rate data could not be refreshed.');
-    if (newsResult.status === 'fulfilled') setNews(newsResult.value);
+    if (rateResult.status === 'fulfilled') { setRates(rateResult.value); setRateError(null); setRateVerified(true); }
+    else { setRateVerified(false); setRateError(rateResult.reason instanceof Error ? rateResult.reason.message : 'Rate data could not be refreshed.'); }
+    if (newsResult.status === 'fulfilled') { setNews(newsResult.value); setNewsError(null); }
     else setNewsError(newsResult.reason instanceof Error ? newsResult.reason.message : 'News could not be refreshed.');
     setLastRefresh(new Date().toISOString());
     setRefreshing(false);
@@ -63,7 +62,8 @@ export default function App() {
   const latest = rates?.points.at(-1);
   const rateStale = isRateStale(rates);
   const newsStale = isNewsStale(news) || Boolean(news?.unavailableMonths?.length);
-  const combinedStale = rateStale || newsStale;
+  const combinedStale = rateStale || newsStale || !rateVerified || Boolean(rateError || newsError);
+  const rateStatus = refreshing ? 'CHECKING' : !rates ? 'UNAVAILABLE' : rateStale ? 'OUT OF DATE' : !rateVerified ? 'SAVED DATA' : 'DAILY REFERENCE';
 
   return (
     <>
@@ -100,22 +100,23 @@ export default function App() {
           <div className="hero-tags"><span>01 / WATCH</span><a href="#forecast">02 / PLAN</a><a href="#signal-room">03 / HEIST TOGETHER</a></div>
         </div>
         <div className="rate-ticket">
-          <div className="ticket-top"><span>DAILY REFERENCE RATE</span><span className="live-label"><i /> {rateStale ? 'UNAVAILABLE' : 'LATEST'}</span></div>
+          <div className="ticket-top"><span>DAILY REFERENCE RATE</span><span className={`live-label ${rateStale || !rateVerified ? 'is-stale' : ''}`}><i /> {rateStatus}</span></div>
           {latest ? <div className="hero-rate">{formatRate(latest.rate)}<span>KRW</span></div> : <div className="hero-rate hero-rate-wait">—<span>KRW</span></div>}
           <div className="ticket-bottom"><span>FOR RM 1.00</span><span>{latest ? formatObservationDate(latest.date) : 'WAITING FOR DATA'}</span></div>
+          <p className="chart-caption">Frankfurter · daily reference, not an intraday quote.</p>
         </div>
       </section>
 
       {(rateError || newsError || rateStale) && <div className="notice" role="status">
         <span className="notice-icon">!</span>
-        <p><strong>{rateStale ? 'Rate data unavailable or out of date.' : 'Some feed data could not be refreshed.'}</strong> {rateError || newsError || 'Showing the last published observation.'} Check the source date before making a travel decision.</p>
+        <p><strong>{rateStale ? 'Rate data unavailable or out of date.' : 'Some feed data could not be refreshed.'}</strong> {rateError ? `Rate refresh failed: ${rateError}. ${rates ? 'Showing saved rate data.' : 'No saved rate is available.'}` : ''} {newsError ? `News refresh failed: ${newsError}.` : ''} Check the source date before making a travel decision.</p>
         <button type="button" onClick={() => void refresh(true)} disabled={refreshing}>TRY AGAIN</button>
       </div>}
 
       <section className="dashboard-section">
-        <div className="section-title-row"><div><span className="section-kicker">MARKET TAPE / RATE HISTORY</span><h2>Rate surveillance</h2></div><span className="panel-counter">DATA FEED <b>{rates ? '01 / OK' : '00 / WAIT'}</b></span></div>
+        <div className="section-title-row"><div><span className="section-kicker">MARKET TAPE / RATE HISTORY</span><h2>Rate surveillance</h2></div><span className="panel-counter">DATA FEED <b>{rateStatus}</b></span></div>
         <div className="market-panel">
-          <RateSurveillance rates={rates} rateStale={rateStale} lastRefresh={lastRefresh} onRefresh={() => void refresh()} />
+          <RateSurveillance rates={rates} rateStale={rateStale} rateError={rateError} refreshing={refreshing} rateVerified={rateVerified} onRefresh={() => void refresh()} />
         </div>
       </section>
 

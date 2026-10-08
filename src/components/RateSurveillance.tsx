@@ -4,7 +4,7 @@ import { fetchPeriodRates, formatFetchedTime, formatObservationDate, formatRate,
 import { RateChart } from './RateChart';
 
 type Period = { key: string; start: string; end: string; label: string };
-type Props = { rates: RateSnapshot | null; rateStale: boolean; lastRefresh: string | null; onRefresh: () => void };
+type Props = { rates: RateSnapshot | null; rateStale: boolean; rateError: string | null; refreshing: boolean; rateVerified: boolean; onRefresh: () => void };
 const HISTORY_CACHE_STALE_MS = 3 * 24 * 60 * 60 * 1000;
 
 function isHistoryCacheStale(snapshot: RateSnapshot | null): boolean {
@@ -42,7 +42,7 @@ function buildPeriods(): Period[] {
   return periods;
 }
 
-export function RateSurveillance({ rates, rateStale, lastRefresh, onRefresh }: Props) {
+export function RateSurveillance({ rates, rateStale, rateError, refreshing, rateVerified, onRefresh }: Props) {
   const periods = useMemo(buildPeriods, []);
   const [view, setView] = useState<'14days' | 'bimonthly'>('14days');
   const [periodKey, setPeriodKey] = useState(periods[0]?.key ?? '');
@@ -82,7 +82,10 @@ export function RateSurveillance({ rates, rateStale, lastRefresh, onRefresh }: P
   const displayed = view === '14days' ? rates?.points ?? [] : history?.points ?? [];
   const historyStale = view === 'bimonthly' && (historyError !== null || (history ? isHistoryCacheStale(history) : !loadingHistory));
   const displayedLatest = displayed.at(-1);
-  const checked = view === '14days' ? lastRefresh : history?.fetchedAt ?? null;
+  const checked = view === '14days' ? rates?.fetchedAt ?? null : history?.fetchedAt ?? null;
+  const validFetchTime = checked && Number.isFinite(Date.parse(checked)) ? checked : null;
+  const savedData = view === '14days' ? !rateVerified || rateStale || Boolean(rateError) : historyStale;
+  const checking = view === '14days' ? refreshing : loadingHistory;
 
   return <>
     <div className="surveillance-tabs" role="tablist" aria-label="Rate history period">
@@ -93,14 +96,14 @@ export function RateSurveillance({ rates, rateStale, lastRefresh, onRefresh }: P
           {periods.map((period) => <option key={period.key} value={period.key}>{period.label}</option>)}
         </select>
       </label>}
-      <button className="history-refresh" type="button" onClick={() => view === '14days' ? onRefresh() : void loadHistory(true)} disabled={view === 'bimonthly' && loadingHistory}>{loadingHistory ? 'LOADING…' : '↻ REFRESH'}</button>
+      <button className="history-refresh" type="button" onClick={() => view === '14days' ? onRefresh() : void loadHistory(true)} disabled={checking}>{checking ? 'LOADING…' : '↻ REFRESH'}</button>
     </div>
     <div className="market-summary">
       <div><span className="micro-label">{view === '14days' ? 'LATEST OBSERVATION' : 'LATEST IN PERIOD'}</span><strong>{displayedLatest ? formatRate(displayedLatest.rate) : '—'} <small>KRW / RM1</small></strong><span className="summary-date">{displayedLatest ? `Published ${formatObservationDate(displayedLatest.date)}` : 'Rate unavailable'}</span></div>
-      <div className="summary-side"><span className="micro-label">{historyStale || rateStale && view === '14days' ? 'SOURCE STATUS' : 'DATA CHECKED'}</span><strong className={historyStale || rateStale && view === '14days' ? 'amber-text' : 'mint-text'}>{historyStale || rateStale && view === '14days' ? 'UNAVAILABLE' : checked ? formatFetchedTime(checked) : 'CHECKING…'}</strong><span className="summary-date">Asia/Kuala_Lumpur</span></div>
+      <div className="summary-side"><span className="micro-label">LAST SUCCESSFUL FETCH</span><strong className={savedData ? 'amber-text' : 'mint-text'}>{validFetchTime ? formatFetchedTime(validFetchTime) : '—'}</strong><span className="summary-date">{validFetchTime ? new Date(validFetchTime).toLocaleDateString('en-MY', { timeZone: 'Asia/Kuala_Lumpur', day: '2-digit', month: 'short', year: 'numeric' }) : 'No successful fetch recorded'} · MYT</span><span className="summary-date">{checking ? 'CHECKING SOURCE…' : savedData ? 'SAVED DATA · CHECK SOURCE' : 'DAILY REFERENCE'}</span></div>
     </div>
     {view === 'bimonthly' && historyError && <p className="inline-stale">{history ? `Refresh failed. Showing saved observations through ${formatObservationDate(history.points.at(-1)!.date)}.` : historyError}</p>}
-    {view === '14days' && rateStale && rates && <p className="inline-stale">Rate feed is unavailable. Last-known observations are shown.</p>}
+    {view === '14days' && savedData && rates && <p className="inline-stale">{rateError ? 'Rate refresh failed. ' : rateStale ? 'The rate observation is out of date. ' : 'Rate not yet refreshed this visit. '}Showing saved observations. A fetch time is not the market quote time.</p>}
     {view === 'bimonthly' && loadingHistory && !history && <p className="inline-stale">Loading daily observations for {selectedPeriod?.label}…</p>}
     <RateChart points={displayed} windowLabel={view === '14days' ? 'Two-week' : selectedPeriod?.label ?? 'Period'} scrollable={view === 'bimonthly'} />
     {view === 'bimonthly' && historyStale && <p className="chart-caption">This period’s source data is unavailable or older than three days. Check again before using it for travel plans.</p>}

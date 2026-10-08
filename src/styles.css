@@ -142,3 +142,6 @@ body, body button:not(:disabled), body a[href], body [role="button"], body input
 .roundtable-form, .roundtable-actions { display: flex; align-items: end; gap: 12px; flex-wrap: wrap; margin-top: 18px; }.roundtable-form label { display: grid; gap: 7px; color: #adbdc4; font: 10px var(--mono); }.roundtable-form input { width: 160px; max-width: 100%; padding: 10px; background: #111923; border: 1px solid #485d66; color: var(--mint); font: 14px var(--mono); }
 .revote-prompt { color: #adbdc4; font-size: 12px; }.revote-prompt button { margin-right: 8px; }
 @media(max-width:450px) { .roundtable { padding: 12px; }.poker-table { gap: 12px; padding: 20px 8px; border-radius: 30px; }.roundtable .vote-card { min-width: 75px; padding: 10px; } }
+
+.live-label.is-stale { color: var(--amber); }
+.live-label.is-stale i { background: var(--amber); animation: none; box-shadow: none; }

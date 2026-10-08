@@ -11,7 +11,7 @@ npm install
 npm run dev
 ```
 
-Open `http://127.0.0.1:5173`. The port is fixed; Vite stops with an error if another process occupies it. The dashboard fetches the latest available observations and headline links when it opens, when Refresh is pressed, and about hourly while the page is visible. It keeps the last successful response in this browser if a refresh fails.
+Open `http://127.0.0.1:5173`. The port is fixed; Vite stops with an error if another process occupies it. The dashboard fetches the latest available observations and headline links when it opens, when Refresh is pressed, and about hourly while the page is visible. It keeps the last successful response in this browser if a refresh fails. The dashboard marks that response as saved data and shows its last successful fetch time separately from the rate observation date. A refresh attempt does not advance that fetch timestamp. These are daily reference rates, so they can differ from intraday Google Finance or Apple Stocks quotes.
 
 ## Enable Signal Rooms
 
