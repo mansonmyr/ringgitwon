@@ -40,7 +40,20 @@ The chart and forecasts are informational and do not guarantee an exchange outco
 
 ## Experimental forecast
 
-Set a personal target in the Plan section. Three cards use 2,000 simulated paths sampled from approximately one year of observed daily rate changes. They compare this calendar month, next month, and the next three full calendar months in Kuala Lumpur time. The method disclosure explains the small, fading English-headline heuristic. Results are unvalidated scenarios, not reliable real-world probabilities. Stale/missing inputs suppress the estimates. Personal targets are saved in browser storage.
+Set a personal target in the Plan section. Three cards use 2,000 simulated paths sampled from approximately one year of observed daily rate changes. They compare this calendar month, next month, and the next three full calendar months in Kuala Lumpur time. The method disclosure explains the small, fading English-headline heuristic. Preliminary historical evaluation found underestimation of target hits; these remain experimental scenarios, not reliable real-world probabilities. Stale/missing inputs suppress the estimates. Personal targets are saved in browser storage.
+
+### Forecast evaluation and MiroFish experiment
+
+The [historical report](devpost/validation/forecast-backtest.md) evaluates 393 overlapping cases using historical monthly origins and targets 1%, 3%, and 5% above the starting rate. Each forecast sees only its trailing year. The next-month mean estimate was 20.5%, versus 34.1% observed target hits. The simulator beats the no-change baseline but loses to a simple historical-frequency baseline for the first two horizons. Cases are correlated; this is exploratory evidence, not an independent accuracy claim. The source's weekend observations also need reconciliation with the simulator's weekday steps.
+
+Reproduce the saved snapshot and run focused implementation checks:
+
+```sh
+npm run check:forecast
+npm run backtest:forecast -- --as-of=2026-10-08
+```
+
+The backtest excludes news because a historical news archive was not supplied. [MiroFish setup research and experiment protocol](devpost/mirofish-experiment.md) and a [historical rehearsal packet](devpost/mirofish-rehearsal.md) are ready. No MiroFish simulation has been executed. Its qualitative scenarios must be evaluated separately before influencing numerical forecasts.
 
 ## Remaining build work
 
