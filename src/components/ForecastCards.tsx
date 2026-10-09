@@ -45,14 +45,14 @@ export function ForecastCards({ rates, news, lastRefresh }: { rates: RateSnapsho
   }, [lastRefresh, today]);
   const selectedHistory = source === 'twelve' ? twelveHistory : history;
   const sourceLabel = source === 'twelve' ? 'Twelve Data' : 'Frankfurter';
+  const newsAvailable = !isNewsStale(news, now) && Boolean(news?.articles.length);
   const calculation = useMemo(() => {
     if (isRateStale(selectedHistory, now)) return { message: 'Current forecast unavailable: use Refresh at the top of the page to update rate history.' };
-    if (isNewsStale(news, now) || !news?.articles.length) return { message: 'Current forecast unavailable: recent news is missing or out of date.' };
     try {
       const points = source === 'twelve' ? selectedHistory!.points : [...selectedHistory!.points, ...(rates?.points ?? [])];
-      return { result: estimateForecast(points, target, news.articles, now, { years: 5, weekdaysOnly: source === 'twelve' }) };
+      return { result: estimateForecast(points, target, newsAvailable ? news!.articles : [], now, { years: 5, weekdaysOnly: source === 'twelve' }) };
     } catch (reason) { return { message: reason instanceof Error ? reason.message : 'Forecast unavailable.' }; }
-  }, [selectedHistory, source, rates, news, target, now]);
+  }, [selectedHistory, source, rates, news, newsAvailable, target, now]);
   const result = calculation.result;
   return <section className="forecast-panel" id="forecast" aria-label="Target forecasts">
     <div className="section-title-row"><div><span className="section-kicker">02 / PLAN THE EXCHANGE</span><h2>Your target, three horizons</h2></div><span className="freshness is-stale">EXPERIMENTAL</span></div>
@@ -74,6 +74,7 @@ export function ForecastCards({ rates, news, lastRefresh }: { rates: RateSnapsho
     {result && <p className="forecast-caption">{sourceLabel.toUpperCase()} · AVAILABLE HISTORY · {formatObservationDate(result.historyStart)} – {formatObservationDate(result.latest.date)} · {result.observations} available observations · {result.excludedGaps} gaps excluded</p>}
     {historyErrors[source] && <p className="stale-note" role="status">{historyErrors[source]} {result ? 'Using the last available history.' : ''}</p>}
     {(error || calculation.message) && <p className="stale-note" role="status">{error} {calculation.message}</p>}
+    {result && !newsAvailable && <p className="forecast-caption" role="status">History-only estimate · Recent headlines are unavailable, so no news adjustment is applied.</p>}
     <div className="forecast-grid">
       {(result?.windows ?? forecastWindows(now)).map((window, index) => {
         const percent = result?.windows[index].percent;
@@ -85,17 +86,18 @@ export function ForecastCards({ rates, news, lastRefresh }: { rates: RateSnapsho
           <div className="pixel-meter" role="img" aria-label={percent === undefined ? 'Estimate unavailable' : `${percent} percent on a zero to one hundred scale`}>
             {Array.from({ length: 20 }, (_, i) => <i key={i} className={percent !== undefined && i < Math.round(percent / 5) ? 'is-filled' : ''} />)}
           </div>
-          {result && <small>Rate observed {formatObservationDate(result.latest.date)}.<br />News checked {new Date(news!.fetchedAt).toLocaleString('en-MY', { timeZone: 'Asia/Kuala_Lumpur' })} MYT.</small>}
+          {result && <small>Rate observed {formatObservationDate(result.latest.date)}.<br />{newsAvailable ? `News checked ${new Date(news!.fetchedAt).toLocaleString('en-MY', { timeZone: 'Asia/Kuala_Lumpur' })} MYT.` : 'Historical rates only; news not included.'}</small>}
         </article>;
       })}
     </div>
     <details className="forecast-method"><summary>How these estimates work</summary>
       {result && <>
         <p>{result.returnSamples} {source === 'twelve' ? 'successive weekday closing changes' : 'consecutive-day changes'}; average daily change {(100 * Math.expm1(result.mean)).toFixed(2)}%, daily variation {(100 * result.volatility).toFixed(2)}%.</p>
-        <p>{result.signal.matches ? `${result.signal.matches} directional headline matches; a small, fading news adjustment is included.` : 'No directional headline matches. News adjustment is neutral.'}</p>
-        {result.signal.articles.length > 0 ? <ul>{result.signal.articles.map(article => <li key={article.url}><a href={article.url} target="_blank" rel="noreferrer">{article.title} ↗</a></li>)}</ul> : <p>No currency-specific articles returned by the news feed.</p>}
       </>}
-      <p>Estimated probability = paths that reach or exceed your target ÷ {PATH_COUNT.toLocaleString()} paths × 100. The calculation samples daily changes from the selected provider’s past five years of available history to generate possible future paths; it does not train a machine-learning model.</p><p>{PATH_COUNT.toLocaleString()} simulated paths sample changes by weekday. {source === 'twelve' ? 'Twelve Data uses completed weekday closes: Friday-to-Monday is one Monday change; simulated rates stay flat on weekends. Weekend bars and gaps across missing weekdays are excluded. These estimates count daily-close target hits, not intraday touches.' : 'Frankfurter advances every calendar day, including weekends, using consecutive-day observations. Returns spanning missing dates are excluded.'} At least eight changes per modeled weekday are required. Holidays are not modeled separately. Each window counts only touches within its own calendar dates in Kuala Lumpur. The next three months are three full months after this month. The calculation assumes past changes remain representative and treats sampled changes as independent; it may miss new market conditions and prolonged trends.</p><p>The English headline heuristic recognizes “ringgit/MYR rises, gains, strengthens” and “Korean won/KRW falls, weakens, drops” as positive, and the reverse as negative. Other headlines have no directional effect. The adjustment is applied only on weekdays, capped at ±0.005% per day and fades over 14 calendar days. This simple rule cannot understand context or causality.</p></details>
-    <p className="forecast-caption">Experimental scenarios. Retrospective rate-only testing found no clear improvement over one-year models; Frankfurter underestimated hits and Twelve Data’s calibration varied across probability ranges; these percentages are not calibrated real-world probabilities. Past changes may not repeat. Even 100% of simulated paths is no guarantee, and 0% does not mean impossible.</p>
+      <p>We generate {PATH_COUNT.toLocaleString()} possible rate paths using daily changes from the selected provider’s past five years of available history. The percentage is the share that reaches your target within each displayed period.</p>
+      <p>{source === 'twelve' ? 'Twelve Data uses weekday closing rates, so a brief move during the day may not count.' : 'Frankfurter uses daily reference observations.'} Changes are sampled by weekday; missing-date gaps are excluded. Each provider is calculated separately.</p>
+      <p>{newsAvailable ? 'Fresh headlines can add a small, unvalidated adjustment based on simple English currency phrases. This fades over 14 days.' : 'Headlines are unavailable or outdated. These estimates use historical rates alone.'} This is a historical simulation, not a trained AI model.</p>
+      <p>Past changes may not repeat. Historical testing found no clear improvement over a one-year history window, and the percentages are not calibrated real-world probabilities.</p></details>
+    <p className="forecast-caption">Experimental estimate: 100% is not a guarantee, and 0% does not mean impossible.</p>
   </section>;
 }

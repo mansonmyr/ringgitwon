@@ -1,6 +1,6 @@
 # RinggitWon — MYR / KRW Watch
 
-The app includes a browser dashboard for daily MYR→KRW reference rates and recent international news, plus Firebase-backed Signal Rooms for travelers to share a target and send a synchronized Test Alert. The graph uses published daily observations, so weekends and holidays can leave gaps and the rate is not a live money-changer quote. Headlines show the current calendar month only, with cached stories retained when GDELT is unavailable.
+The app includes a MYR→KRW dashboard, experimental target simulations, publisher headlines, and Firebase Signal Rooms for shared targets, timed votes and connected-page alerts. Twelve Data supplies the optional main market quote; Frankfurter supplies daily reference charts. News covers Malaysia, English South Korea and international reports for today and the previous two days in MYT, with a maximum of 30 per section.
 
 ## Run locally
 
@@ -17,7 +17,7 @@ Open `http://127.0.0.1:5173`. The port is fixed; Vite stops with an error if ano
 
 The local development/preview server supports a server-side Twelve Data quote for `MYR/KRW`. To activate it:
 
-1. Obtain a [Twelve Data API key](https://twelvedata.com/forex) and confirm your account can access `MYR/KRW` through the exchange-rate endpoint. Pair access has not yet been verified for this project.
+1. Obtain a [Twelve Data API key](https://twelvedata.com/forex) and confirm your account can access `MYR/KRW` through the exchange-rate endpoint. The configured development account returned MYR/KRW data; other accounts must confirm their own access.
 2. Add `TWELVE_DATA_API_KEY=your_key_here` to your existing, ignored `.env.local`. Keep the Firebase settings. Do **not** prefix this key with `VITE_` or paste it into browser code.
 3. Restart `npm run dev`. The main ticket should say **LATEST MARKET RATE**, show Twelve Data attribution, and show its quote timestamp in MYT. Rejected credentials, unsupported pair/plan access, and provider failures show an unavailable state.
 
@@ -43,7 +43,7 @@ Without those settings, the app explains what is needed and keeps the room actio
 
 - [Frankfurter](https://frankfurter.dev/) for daily reference rates and rate history.
 - [Twelve Data](https://twelvedata.com/) for an optional intraday quote (requires server-side configuration and account access).
-- [GDELT DOC](https://blog.gdeltproject.org/gdelt-doc-2-0-api-debuts/) for recent headline links.
+- Malay Mail, The Korea Times and CNA RSS for publisher headline links (GDELT replaced).
 
 The chart and forecasts are informational and do not guarantee an exchange outcome. This project does not exchange money.
 
@@ -74,7 +74,7 @@ The backtest excludes news because a historical news archive was not supplied. [
 
 ## Remaining build work
 
-The roundtable is implemented locally; publish the updated database.rules.json before using it. Multi-client roundtable verification and the final end-to-end review remain unfinished. Browser notifications require an open, connected page; closed-app push and continuous server monitoring are not implemented.
+The learner reports forecast target changes, the Shared Target refresh control and two-person Signal Room use work. The build checklist distinguishes these reports from exhaustive edge-case testing. Final review documentation, public repository, license, demo video and public hosting remain to be completed. Browser notifications require an open, connected page; closed-app push and continuous server monitoring are not implemented.
 
 ## Target roundtable
 
@@ -95,3 +95,15 @@ Frankfurter underestimates target hits; Twelve Data averages are closer but do n
 Email signup, verification, unsubscribe controls, and room test-email dispatch are implemented in the UI. A separate [Workers Free + Brevo Free backend](email-worker/README.md) is prepared for 30-minute background target checks without upgrading Firebase Spark. It stores email subscriptions privately in Cloudflare D1, authenticates existing Firebase users, requires explicit consent and email verification, and suppresses duplicate send attempts.
 
 **Not deployed or connected yet.** Leave `VITE_EMAIL_API_URL` blank until free accounts, a verified Brevo sender, Worker secrets and D1 setup are ready. No emails have been sent; only frontend compilation and Worker syntax have been checked. The email section clearly reports that sending is unavailable until connected. Quota limits, possible missed crossings and at-most-once delivery tradeoffs are documented in the setup guide. This is not a 24/7 delivery guarantee.
+
+### Publisher headlines (replaces GDELT)
+
+The local `/api/news` endpoint reads Malay Mail Malaysia RSS, The Korea Times South Korea, Economy and Business English RSS, and CNA Business/World RSS. It uses fixed source URLs, a shared 30-minute cache and a one-minute retry delay after failures. Browser storage retains up to 30 headlines per section from the current and previous two calendar days in Malaysia time (90 total), with separate Malaysian/South Korean/international sections and per-feed successful-update timestamps. RSS is a rolling feed, not a complete archive. International coverage uses the publisher’s Business category plus World headlines matching business, war, trade-fair or aviation terms; title matching can miss relevant reports. Limits apply on cache reads, refreshes and display, with minute-by-minute expiry while the section is mounted. Reload uses a fresh 30-minute cache; manual refresh still respects the server cache. Failed sources keep saved reports without resetting their timestamps; forecasts can continue without fresh news.
+
+This endpoint is included in Vite development and preview. Static-only hosting must provide an equivalent backend route. Only headlines, dates, attribution and links are displayed. Publisher terms still apply; CNA describes its feeds as for personal, non-commercial use—review rights before public/commercial distribution: https://www.channelnewsasia.com/rss . Malay Mail source: https://www.malaymail.com/feed/rss/malaysia . No GDELT account or news API key is required.
+
+South Korean feed directory: https://www.koreatimes.co.kr/rss . The South Korea feed is original English reporting; the app does not machine-translate titles.
+
+## Project handoff
+
+See [app map](devpost/app-map.html) for code navigation and [submission guide](devpost/submission-guide.md) for required materials, factual feature inventory and learner writing prompts. The learner's [public repository](https://github.com/mansonmyr/ringgitwon) currently contains only a README and a PolyForm Noncommercial license. Application code still needs uploading, the license needs to meet the hackathon's open-source requirement, and no demo-video URL has been supplied.

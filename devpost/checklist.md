@@ -74,11 +74,11 @@ Build mode: fast
 - [ ] Optional edit and transfer reflection addressed — offered/declined/already covered/not applicable as appropriate
 - [ ] `devpost/app-map.html` generated from finished code, checked, and shown, including a project-grounded practice to reuse
 
-Activity and evidence: [what actually happened; real document/test/code references; unfinished work if interrupted]
-Route and stops: [actual paths and symbols; guided stops completed, or reference-only route]
-Edit outcome: [tried/kept/reverted/declined/not applicable; verification if changed]
-Reflection: [offered/answered/declined/already covered — personal answer belongs only in the ignored profile]
-Activity mode: [live app and editor, explicit static fallback, focused alternative, prior practice, or recap]
+Activity and evidence: Static reference map prepared from ForecastCards → estimateForecast → forecast-grid. The forecast/news failure and history-only fallback provide a concrete example for the wrap-up. An interactive tour is not claimed; the learner's supplied reflection is recorded below.
+Route and stops: reference-only route in devpost/app-map.html: src/components/ForecastCards.tsx (forecast-target), src/lib/forecast.ts (estimateForecast), ForecastCards.tsx (forecast-grid).
+Edit outcome: No optional learner code edit in this wrap-up; previous user-directed UI revisions are documented below.
+Reflection: Learner supplied their own inspiration and learning reflection; exact words retained only in the ignored learner profile. No public narrative generated.
+Activity mode: Static reference and project-grounded recap prepared; not an interactive code tour.
 
 ## Revisions
 
@@ -115,3 +115,15 @@ Activity mode: [live app and editor, explicit static fallback, focused alternati
 - Follow-up feedback changes the main quote to “Latest market rate,” explains its difference from the selected daily reference chart, and slows browser polling/server quote caching to 30 minutes. Quote freshness/alert continuity tolerance is now 60 minutes so normal polling intervals do not immediately become stale; failed refreshes still pause automatic market-rate alerts. Historical-data caching remains six hours.
 
 - Email notifications requested; learner chose no billing account. Added private opt-in/verification/stop-email UI and wired room test alerts to an optional authenticated email endpoint. Prepared Workers Free/D1/Brevo Free backend, half-hour scheduled crossing checks, unsubscribe links, atomic duplicate claims, demo caps, and room-deletion cleanup. Firebase Spark remains unchanged. Frontend build and Worker syntax pass; no emails, deployment, paid resources, or live backend tests were run. Activation and delivery/security runtime verification remain pending free-account/sender setup described in `email-worker/README.md`.
+
+- Learner requested immediate replacement of GDELT. Switched to fixed publisher RSS endpoints (Malay Mail Malaysia; CNA Business/World), separate local/international lists, server cache, source update times and per-source saved-report fallback. Rolling feeds are labelled honestly rather than a full month archive. Existing forecast fix permits history-only estimates when news is unavailable. Email activation is deferred at the learner's request. Publisher feed access was inspected; no browser interaction tests were run for this change.
+
+- Follow-up adds an English South Korea section from The Korea Times official South Korea RSS feed. Publisher returned 11 readable reports during integration research; Malay Mail domestic feed returned 50. These are source-access observations, not browser interaction tests.
+
+- News retention updated at learner request: last 72 hours, newest 30 per section (90 total); prune stored and displayed reports, retire obsolete GDELT caches, and filter International to publisher Business plus World-title matches for business, war, trade fairs and aviation. Reloads retain the existing 30-minute cache behavior. Build passes; no browser/runtime tests were requested or run.
+
+- Learner confirmed forecast target changes function. News now uses today and the previous two calendar days in MYT, capped at 30 per section; South Korean coverage combines Korea Times domestic, economy and business RSS, deduplicated by URL. RSS cannot backfill reports no longer supplied; no padding or older-than-window articles are added. Added Shared Target refresh/read status. Completed accepted-and-applied, rejected and closed tables disappear from the UI, leaving Propose New Target; unresolved ties/all-Hold remain actionable. Firebase round records are retained. Build passes; no new runtime tests were run.
+
+- Shipping-preparation request: learner confirms Shared Target refresh and two-person Signal Room use work, after previously confirming forecast target changes. Record these as user reports, not exhaustive tests. Reviewed official hackathon requirements; no Git remote or project license found. Prepared submission field guide, app map, and unedited dashboard/forecast screenshots. No public deployment, repository creation, upload or submission performed. Formal build completion remains open for remaining verification and final sign-off.
+
+- Learner supplied their own public repository, https://github.com/mansonmyr/ringgitwon. Unauthenticated GitHub API access confirmed public visibility and only README.md / LICENSE present. Remote LICENSE is PolyForm Noncommercial 1.0.0 (GitHub: Other / NOASSERTION); license choice needs resolving against the open-source requirement. No remote license or code was changed. A limited scan of 163 existing Git history blobs found no configured Twelve Data key, standard private-key headers, GitHub-token patterns or AWS-access-key patterns; the learner profile is neither tracked nor in history. This is not a comprehensive publication audit. Production build passed (bundle-size advisory only); no new runtime tests were run.

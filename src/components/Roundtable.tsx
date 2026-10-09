@@ -14,6 +14,7 @@ export function Roundtable({ database, code, identity, room }: { database: Datab
   const [connected, setConnected] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [compose, setCompose] = useState(false);
   const [holdDrawn, setHoldDrawn] = useState(false);
   const attempt = useRef('');
   const round = room.roundtable;
@@ -25,7 +26,8 @@ export function Roundtable({ database, code, identity, room }: { database: Datab
   useEffect(() => onValue(ref(database, '.info/serverTimeOffset'), snapshot => setOffset(Number(snapshot.val()) || 0)), [database]);
   useEffect(() => onValue(ref(database, '.info/connected'), snapshot => { setConnected(snapshot.val() === true); attempt.current = ''; }), [database]);
   useEffect(() => { setNow(Date.now() + offset); const timer = window.setInterval(() => setNow(Date.now() + offset), 1000); return () => clearInterval(timer); }, [offset]);
-  useEffect(() => { setHoldDrawn(false); setError(''); }, [round?.id]);
+  useEffect(() => { setHoldDrawn(false); setError(''); setCompose(false); }, [round?.id]);
+  useEffect(() => { setTarget(String(room.sharedTarget)); }, [room.sharedTarget]);
 
   async function action(operation: () => Promise<void>) {
     setBusy(true); setError('');
@@ -48,10 +50,12 @@ export function Roundtable({ database, code, identity, room }: { database: Datab
   // Include departed voters so recorded cards remain visible until the round closes.
   const travelers = { ...Object.fromEntries(Object.entries(ballots).map(([uid, ballot]) => [uid, { ...ballot, online: false }])), ...room.members };
   const holds = Object.keys(travelers).length - tally.follow - tally.fold;
+  const finished = round && (round.status === 'rejected' || round.status === 'closed' || (round.status === 'accepted' && round.applied));
+  if (finished && !compose) return <button className="news-inline-retry" type="button" onClick={() => setCompose(true)}>PROPOSE NEW TARGET</button>;
   return <section className="roundtable" aria-label="Target roundtable">
     <div className="roundtable-heading"><div><span className="section-kicker">THE CREW DECIDES</span><h3>Target roundtable</h3></div><span className="micro-label">{connected ? 'TABLE CONNECTED' : 'CONNECTING…'}</span></div>
     <p className="roundtable-help">Follow changes the target. Fold keeps it. Hold does not count. Your room master must keep the room open to finalize the result.</p>
-    {round && <>
+    {round && !finished && <>
       <div className="roundtable-proposal"><strong>{formatRate(round.target)} <small>KRW / RM1</small></strong><span>Raised by {round.proposerName}</span><time>{round.status === 'open' ? `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')} remaining` : 'Voting finished'}</time></div>
       <div className="poker-table">
         {Object.entries(travelers).map(([uid, traveler]) => <div className="table-seat" key={uid}><span className="avatar-glyph">{traveler.avatar}</span><strong>{traveler.name}{uid === identity.uid ? ' (you)' : ''}</strong><span className={`played-card vote-${ballots[uid]?.choice ?? 'hold'}`}>{ballots[uid]?.choice?.toUpperCase() ?? (voteOpen ? 'WAITING' : 'HOLD')}</span></div>)}

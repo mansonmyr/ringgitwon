@@ -156,3 +156,9 @@ body, body button:not(:disabled), body a[href], body [role="button"], body input
 .email-alerts input[type="checkbox"] { width: auto; flex: 0 0 auto; margin-top: 2px; accent-color: #9eebc6; }
 .email-alerts button { justify-self: start; padding: 9px 12px; border: 1px solid #63847e; background: #192d30; color: #a6efcd; font: 10px var(--mono); }
 .email-alerts button:disabled { opacity: .5; }
+
+.news-desk { margin: 20px 0; }
+.news-desk h3 { color: var(--cyan); font: 13px var(--mono); }
+.news-desk h3 small { color: var(--muted); }
+.room-shared-rate { flex-wrap: wrap; }
+.room-shared-rate .shared-target-refresh { margin-left: auto; align-self: flex-start; flex-shrink: 0; }

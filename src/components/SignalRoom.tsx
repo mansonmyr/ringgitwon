@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { Database } from 'firebase/database';
+import { get, ref } from 'firebase/database';
 import { connectFirebaseMember, firebaseConfigured } from '../lib/firebase';
 import {
   avatarFor, createRoom, dismissRoom, joinRoom, publishRateCrossing, sendTestAlert, subscribeRoom,
@@ -30,6 +31,10 @@ export function SignalRoom({ rate: latest }: { rate: RoomRate | null }) {
   const [room, setRoom] = useState<RoomData | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [targetRefreshing, setTargetRefreshing] = useState(false);
+  const [targetRefreshMessage, setTargetRefreshMessage] = useState('');
+  const activeCode = useRef(roomCode);
+  activeCode.current = roomCode;
   const [repeatPings, setRepeatPings] = useState(0);
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission | 'unsupported'>(
     () => typeof window !== 'undefined' && 'Notification' in window ? Notification.permission : 'unsupported',
@@ -142,6 +147,24 @@ export function SignalRoom({ rate: latest }: { rate: RoomRate | null }) {
     } finally {
       setBusy(false);
     }
+  }
+
+  async function refreshSharedTarget() {
+    if (!database || !roomCode || targetRefreshing) return;
+    const code = roomCode;
+    setTargetRefreshing(true); setTargetRefreshMessage('');
+    try {
+      const connected = await get(ref(database, '.info/connected'));
+      if (connected.val() !== true) throw new Error('Reconnect to refresh the shared target.');
+      const snapshot = await get(ref(database, `rooms/${code}/sharedTarget`));
+      if (activeCode.current !== code) return;
+      const value = snapshot.val();
+      if (typeof value !== 'number' || !Number.isFinite(value) || value <= 0) throw new Error('The room or shared target is no longer available.');
+      setRoom(current => current ? { ...current, sharedTarget: value } : current);
+      setTargetRefreshMessage('Shared target refreshed.');
+    } catch (reason) {
+      if (activeCode.current === code) setTargetRefreshMessage(reason instanceof Error ? reason.message : 'Could not refresh the shared target.');
+    } finally { setTargetRefreshing(false); }
   }
 
   async function testAlert() {
@@ -280,8 +303,9 @@ export function SignalRoom({ rate: latest }: { rate: RoomRate | null }) {
       </div> : <div className="room-live">
         <div className="room-live-top"><div><span className="micro-label">ROOM NUMBER</span><strong className="room-code">{roomCode}</strong><span className="room-role">{isMaster ? 'ROOM MASTER' : 'CREW MEMBER'}</span></div><div className="room-live-actions">{isMaster && <button type="button" className="room-dismiss" onClick={() => void dismissCurrentRoom()} disabled={busy}>DISMISS ROOM</button>}<button type="button" className="room-leave" onClick={leaveRoom}>LEAVE ROOM</button></div></div>
         {room ? <>
-          <div className="room-shared-rate"><div><span className="micro-label">SHARED TARGET</span><strong>{formatRate(room.sharedTarget)} <small>KRW / RM1</small></strong></div><div><span className="micro-label">LATEST RATE</span><strong>{latest ? formatRate(latest.rate) : '—'} <small>KRW / RM1</small></strong></div></div>
+          <div className="room-shared-rate"><div><span className="micro-label">SHARED TARGET</span><strong>{formatRate(room.sharedTarget)} <small>KRW / RM1</small></strong></div><div><span className="micro-label">LATEST RATE</span><strong>{latest ? formatRate(latest.rate) : '—'} <small>KRW / RM1</small></strong></div><button type="button" className="news-inline-retry shared-target-refresh" disabled={targetRefreshing} onClick={() => void refreshSharedTarget()}>{targetRefreshing ? 'CHECKING…' : '↻ REFRESH'}</button></div>
           <p className="chart-caption">{latest ? <>{latest.source === 'Twelve Data' ? <a href="https://twelvedata.com" target="_blank" rel="noopener noreferrer">Twelve Data</a> : latest.source} · {latest.timeLabel}</> : 'Waiting for a verified rate source.'} {!latest?.fresh && 'Automatic rate alerts paused.'}</p>
+          {targetRefreshMessage && <p className="chart-caption" role="status">{targetRefreshMessage}</p>}
           <div className="room-scene">
             <div className="room-travelers">{members.map(([uid, traveler], index) => <div className={`room-traveler traveler-${index % 6}`} key={uid} title={`${traveler.name}${traveler.online ? ' · online' : ' · away'}`}>
               <span className="traveler-avatar"><span className="avatar-glyph">{traveler.avatar || avatarFor(index)}</span></span><span className="traveler-name">{traveler.name}</span><i className={traveler.online ? 'online' : ''} />

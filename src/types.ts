@@ -14,10 +14,13 @@ export type Headline = {
   source: string;
   publishedAt: string;
   language?: string;
+  category?: 'local' | 'international' | 'korea';
+  feedId?: string;
 };
 
 export type NewsSnapshot = {
   articles: Headline[];
   fetchedAt: string;
   unavailableMonths?: string[];
+  feeds?: { id: string; name: string; fetchedAt?: string; error?: string }[];
 };
