@@ -1,0 +1,14 @@
+{
+  "name": "ringgitwon-email",
+  "main": "src.js",
+  "compatibility_date": "2026-10-09",
+  "workers_dev": true,
+  "triggers": { "crons": ["*/30 * * * *"] },
+  "d1_databases": [{ "binding": "DB", "database_name": "ringgitwon-email", "database_id": "REPLACE_WITH_D1_ID", "migrations_dir": "migrations" }],
+  "vars": {
+    "APP_ORIGINS": "http://127.0.0.1:5173",
+    "PUBLIC_URL": "https://REPLACE_WITH_WORKER_URL.workers.dev",
+    "FIREBASE_DATABASE_URL": "https://ringgitheist-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "SENDER_EMAIL": "REPLACE_WITH_VERIFIED_BREVO_SENDER"
+  }
+}

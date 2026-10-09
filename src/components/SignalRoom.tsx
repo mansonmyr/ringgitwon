@@ -7,6 +7,8 @@ import {
 import type { RoomData, RoomIdentity } from '../lib/rooms';
 import { formatRate } from '../lib/rates';
 import { Roundtable } from './Roundtable';
+import { EmailAlerts } from './EmailAlerts';
+import { emailAlertsConfigured, emailRequest } from '../lib/emailAlerts';
 
 const AVATARS = ['🕵️', '🧙', '🦊', '🐈', '🦉', '🦝'];
 
@@ -154,6 +156,14 @@ export function SignalRoom({ rate: latest }: { rate: RoomRate | null }) {
         setNotificationPermission(await Notification.requestPermission());
       }
       await sendTestAlert(database, roomCode, member.name, alertId);
+      if (emailAlertsConfigured) {
+        try {
+          const result = await emailRequest<{ message: string }>('test', roomCode, { event: alertId });
+          setNotificationMessage(result.message);
+        } catch (emailError) {
+          setNotificationMessage(`Room alert sent. Email: ${emailError instanceof Error ? emailError.message : 'delivery unavailable.'}`);
+        }
+      }
     }
     catch (nextError) {
       alreadyPlayedAlert.current = null;
@@ -286,6 +296,7 @@ export function SignalRoom({ rate: latest }: { rate: RoomRate | null }) {
           {notificationMessage && <p className="room-notification-message" role="status">{notificationMessage}</p>}
           {room.alert && <div className="party-alert" role="status" key={room.alert.id}><span className="alert-signal">PING</span><div><strong>{room.alert.message}</strong><small>{room.alert.kind === 'test' ? 'TEST ALERT' : `RATE REACHED · ${room.alert.rateDate ?? ''}`}</small></div></div>}
           {repeatPings > 0 && <p className="repeat-ping">PING {repeatPings + 1} · Rate remains above the shared target.</p>}
+          <EmailAlerts key={roomCode} room={roomCode} />
           {database && member && <Roundtable database={database} code={roomCode} identity={member} room={room} />}
         </> : <div className="room-wait">CONNECTING TO ROOM SIGNAL…</div>}
         {error && <div className="room-error" role="alert">{error}</div>}
