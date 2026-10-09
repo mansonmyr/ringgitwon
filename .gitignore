@@ -6,3 +6,5 @@
 /dist/
 /.firebase/
 .DS_Store
+
+/.cache/

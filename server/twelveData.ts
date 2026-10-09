@@ -1,6 +1,6 @@
 import type { Connect } from 'vite';
 
-const INTERVAL = 5 * 60_000;
+const INTERVAL = 30 * 60_000;
 type Quote = { rate: number; observedAt: string; fetchedAt: string; source: 'Twelve Data'; symbol: 'MYR/KRW' };
 
 // Fixed pair and shared cache: clients cannot spend credits on arbitrary queries.

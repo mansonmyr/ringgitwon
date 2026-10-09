@@ -112,12 +112,12 @@ export default function App() {
           <div className="hero-tags"><span>01 / WATCH</span><a href="#forecast">02 / PLAN</a><a href="#signal-room">03 / HEIST TOGETHER</a></div>
         </div>
         <div className="rate-ticket">
-          <div className="ticket-top"><span>{useIntraday ? 'INTRADAY EXCHANGE RATE' : 'DAILY REFERENCE RATE'}</span><span className={`live-label ${(useIntraday ? !intraday.fresh : rateStale || !rateVerified) ? 'is-stale' : ''}`}><i /> {displayedStatus}</span></div>
+          <div className="ticket-top"><span>{useIntraday ? 'LATEST MARKET RATE' : 'DAILY REFERENCE RATE'}</span><span className={`live-label ${(useIntraday ? !intraday.fresh : rateStale || !rateVerified) ? 'is-stale' : ''}`}><i /> {displayedStatus}</span></div>
           {displayedRate !== undefined ? <div className="hero-rate">{formatRate(displayedRate)}<span>KRW</span></div> : <div className="hero-rate hero-rate-wait">—<span>KRW</span></div>}
           <div className="ticket-bottom"><span>FOR RM 1.00</span><span>{useIntraday ? intraday.quote ? `${quoteTime(intraday.quote.observedAt)} MYT` : 'WAITING FOR QUOTE' : latest ? formatObservationDate(latest.date) : 'WAITING FOR DATA'}</span></div>
-          <p className="chart-caption">{useIntraday ? <><a href="https://twelvedata.com" target="_blank" rel="noopener noreferrer">Twelve Data</a> · checked every 5 minutes while this page is visible. Time shown is the provider’s quote time.</> : 'Frankfurter · daily reference, not an intraday quote.'}</p>
-          {intraday.error && <p className="chart-caption" role="status">{intraday.error} {intraday.quote ? 'Showing the last quote. ' : ''}Intraday alerts paused.</p>}
-          {useIntraday && intraday.quote && !intraday.fresh && !intraday.error && <p className="chart-caption" role="status">Quote is over 10 minutes old. Intraday alerts paused.</p>}
+          <p className="chart-caption">{useIntraday ? <><a href="https://twelvedata.com" target="_blank" rel="noopener noreferrer">Twelve Data</a> · checked every 30 minutes while this page is visible. This rate changes throughout the day. The chart below uses Frankfurter’s daily reference rates for the selected dates, so its value can differ. Time shown is when this market quote was recorded.</> : 'Frankfurter · a daily reference rate; market prices can change throughout the day.'}</p>
+          {intraday.error && <p className="chart-caption" role="status">{intraday.error} {intraday.quote ? 'Showing the last quote. ' : ''}Market-rate alerts paused.</p>}
+          {useIntraday && intraday.quote && !intraday.fresh && !intraday.error && <p className="chart-caption" role="status">Quote is over 60 minutes old. Market-rate alerts paused.</p>}
         </div>
       </section>
 
