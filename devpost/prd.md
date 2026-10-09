@@ -5,7 +5,7 @@ status: approved
 
 # MYR→KRW Travel Rate Party — Product Requirements
 
-A small, public web app for Malaysian travelers heading to South Korea to follow the exchange rate, compare an uncertain target forecast, and coordinate with their travel party. This PRD describes the working proof of concept; the requested Bi-Monthly history, current-month multilingual news window, and expanded currency artwork extend the original 2–4 hour target.
+A small, public web app for Malaysian travelers heading to South Korea to follow the exchange rate, compare an uncertain target forecast, and coordinate with their travel party. This PRD describes the working proof of concept; the requested Bi-Monthly history, three-day publisher news window, and expanded currency artwork extend the original 2–4 hour target.
 
 Source: `scope.md > The Unique Kernel`, `Who It's For`, and `The POC Boundary`.
 
@@ -14,7 +14,7 @@ Source: `scope.md > The Unique Kernel`, `Who It's For`, and `The POC Boundary`.
 1. A traveler opens the public app and sees the current rate as KRW per RM1, a two-week rate graph, a broad news banner, and three forecast cards.
 2. They inspect the graph: today’s rate is marked with a gently animated pointer; they scroll through the two-week period to inspect other days and see the period’s highest rate.
 3. They can switch Rate Surveillance from the default two-week chart to a **Bi-Monthly** tab, choose a completed two-month period labeled across 2022–2026, and inspect its daily rates and peak. In October, the newest complete period is August–September.
-4. They browse the current calendar month's scrollable headline list. It includes source headlines in all available languages across finance, policy, conflict, and trade; opening a headline takes them to its original report.
+4. They browse Malaysia, English South Korea and international headline sections for today and the previous two MYT calendar days, capped at 30 per section; international coverage includes business, war, trade fairs and aviation; opening a headline takes them to its original report.
 5. They review the three forecast windows—this month, next month, and the next three months—to compare the estimated chance of their target being reached and why the estimate looks that way.
 6. They enter a minimum target rate. A solo traveler can change their own target directly. For a shared trip, the room master sets the initial shared target and connected party members can receive a test alert or a live target-reached alert.
 7. A traveler creates a room and shares its six-digit room number, or joins by entering a room number. Members’ avatars appear in the room.
@@ -54,7 +54,7 @@ Source: learner feedback after the first dashboard preview.
 
 - Show the six-digit room number, shared target, rate/alert state, and party avatars.
 - The room has a cozy, magical-school atmosphere. Avatars may stand, casually walk, or interact with one another.
-- Provide two selectable shared areas: **Seoul / Night Watch** and **Common Room**. A traveler can move between them; each connected member sees avatars in their chosen area.
+- Show all travelers in one shared avatar scene; location buttons were removed at the creator’s request.
 - Provide controls for the room master to set the initial shared target, for connected members to send a Test Alert, and for a member to raise a target-change roundtable.
 - A new room alert plays a short sound and displays a browser notification for members who enabled notifications. Keep the in-app alert visible as a fallback. Browser notifications require the site to remain open and connected in this version.
 
@@ -96,20 +96,20 @@ Source: `scope.md > The Core Loop` and `The POC Boundary`.
 
 - Show three side-by-side estimates: **This month**, **Next month**, and **Next 3 months**. Use calendar boundaries: “This month” runs from now through the last day of the current calendar month; “Next month” is the following calendar month; the working interpretation of “Next 3 months” is the three full calendar months after the current one.
 - Each estimates the chance that the traveler’s target rate will be reached in that window. Use the same visual scale across all three and a pixel-art meter so travelers can compare them at a glance.
-- Under each estimate, show a short **Why?** summary with the main market and news factors, links to relevant articles, and the data update time.
+- Keep source timestamps in each card. Consolidate historical statistics and model explanation under **How these estimates work** beneath the cards; remove repeated Why headings.
 - Display an uncertainty note. Do not show a precise predicted date or make the estimate sound guaranteed.
-- A broader, scrollable headline list shows current-calendar-month finance, political policy, conflict, and trade news in every language returned by the source; selecting a headline opens its original article.
-- If the provider is unavailable, show saved current-month headlines with their original dates and a refresh action; do not invent headlines.
-- If news or exchange-rate information is missing or out of date, show a refresh button. If a refresh still fails, keep the last-known rate visible with its update time and state that current data/forecast information is unavailable; do not imply the stale forecast is current.
+- Three publisher headline sections cover today and the previous two MYT calendar days, up to 30 each: Malaysia, English South Korea, and international business, war, trade fairs and aviation. Each headline opens its original article.
+- If the provider is unavailable, show saved in-window headlines with their original dates and a refresh action; do not invent headlines.
+- If rate history is unavailable or stale, keep saved values dated and suppress a current forecast. Missing or stale headlines alone permit a labelled history-only estimate with no news adjustment. Refresh remains available at the top of the page.
 - **Acceptance criteria**
   - [ ] All three forecast windows appear together and each has a computed chance estimate for the currently set target.
   - [ ] All three estimates use the same scale and show a pixel-art meter.
-  - [ ] Each card has a concise Why? summary, relevant article links, and a data-updated time.
+  - [ ] Cards show source timestamps; shared method details appear once below the cards.
   - [ ] The uncertainty note is visible; the interface does not promise a date or guaranteed outcome.
-  - [ ] A scrollable list shows returned headlines across languages, covers finance, policy, conflict, and trade, and opens each original report or newspaper article when tapped.
-  - [ ] The news panel shows only current-calendar-month headlines and provides a refresh action when its source request fails.
+  - [ ] The three sections enforce their date/count limits and international topic filter, and open original publisher reports.
+  - [ ] The news panel shows only the agreed three-day window and provides a refresh action when its source request fails.
   - [ ] Missing or stale news/rate information exposes a refresh action.
-  - [ ] If refresh fails, the last-known rate remains visible with its update time, while the app says current data or forecast information is unavailable.
+  - [ ] If rate refresh fails, saved rates retain their timestamps and unavailable forecasts are labelled. News failure alone does not block a history-only calculation.
 
 Source: `scope.md > The POC Boundary` and `What "Working" Looks Like`.
 
@@ -137,13 +137,13 @@ Source: `scope.md > The Core Loop` and `The POC Boundary`.
 - A traveler can create a room or join one by entering its six-digit room number.
 - The creator is automatically the room master and sets the initial shared target.
 - Members’ avatars appear in the room and may stand, walk casually, or interact with other avatars.
-- The scene has selectable Seoul / Night Watch and Common Room areas. Moving an avatar updates its shared location for connected members.
+- The scene shows all connected travelers together; there are no selectable room locations.
 - If a number does not match a room, show: **“No room found. Do you want to create a new room?”**
 - **Acceptance criteria**
   - [ ] Creating a room gives the traveler a six-digit room number and room-master role.
   - [ ] The room master can set the initial shared target.
   - [ ] A traveler can join by entering a six-digit number; joined members’ avatars appear in the room.
-  - [ ] A traveler can move between Seoul / Night Watch and Common Room, and room members see the chosen area.
+  - [ ] Connected members see each other in the shared scene, without location controls.
   - [ ] An unknown room number displays the agreed prompt to create a room.
 
 Source: `scope.md > The Core Loop` and `The Unique Kernel`.
@@ -245,3 +245,7 @@ Source: learner feedback after the first dashboard preview.
 - **Resolve before build:** Are member avatars chosen by travelers or assigned automatically? Their appearance and movement style are set, but selection behavior is not.
 - **Not blocking:** The product name, exact color palette, and typography have not been selected; the working title is descriptive.
 - **Assumption to confirm in `4-spec`:** Creating a room generates a new six-digit room number that the creator can share.
+
+## Current build acceptance amendments — 9 October 2026
+
+These reflect approved feedback, not new scope: market quotes poll every 30 minutes while visible and are distinguished from daily chart values; forecasts use separate five-year provider histories; completed accepted/applied, rejected or closed tables disappear, leaving Propose New Target, while unresolved ties/all-Hold remain actionable. Shared Target refresh sits at the right end. Email delivery is prepared but inactive. Public deployment is a shipping task; the final build review uses the local app.

@@ -9,76 +9,80 @@ Build mode: fast
 
 ## Slices
 
-- [ ] **1. Open the live-feeling rate dashboard**
-  Becomes usable: A runnable pixel-heist dashboard with real daily MYR→KRW reference data, the two-week chart and peak, today's marker, day inspection, a scrollable all-language headline list for the current calendar month, refresh, a small snapshot-matched cursor on clickable controls, naturally flowing real Ringgit/Won banknotes, a saved dark/light inverse-color switch that preserves banknote colors, and no “REFERENCE ONLY” stamp.
-  Why now: Project setup and the unfamiliar rate/news sources are proved in the first visible behavior; the user’s first-preview feedback is included before the page foundation is committed.
-  PRD ref: `prd.md > The Core Journey`, `prd.md > Rate Dashboard and Graph`, `prd.md > Forecast Cards and News` (headline behavior), `prd.md > Currency visuals and cursor`
-  Spec ref: `spec.md > Stack`, `spec.md > Where It Runs and How Someone Tries It`, `spec.md > Rate data service and dashboard`, `spec.md > News banner and forecast engine`, `spec.md > Currency pointer and background art`, `spec.md > External Services and Dependencies`
-  Build: Keep the two-week dashboard chart; fetch aligned Frankfurter data and current-month GDELT headlines without a language filter; render the scrollable article list, real official banknote images that flow naturally, the small black/white/cyan snapshot cursor on clickable controls, and the saved inverse-color theme switch without recoloring note artwork; remove the rate-ticket stamp; add last-known caching, refresh, and failure labels.
-  Verify (mechanical): Run `npm run build`; run the local server and confirm the rate is shown, the news list scrolls through every returned in-range headline, provider failure shows the cached-list/stale state, and the browser console has no errors.
-  Learner check: Open the dashboard, inspect another day, find the two-week peak, browse current-month headlines, open one original report, change the color mode, watch the banknotes flow, and press Refresh. Say what feels right or confusing before later slices depend on the layout.
-  Commit: `Build rate dashboard, news, and currency visuals`
+The criteria below reconcile approved preview changes on 10 October 2026. Earlier plans remain in Git history and the revisions below. Verification is proportional to this proof of concept; detailed evidence and limits are in `validation/build-closeout.md`.
 
-- [ ] **2. Set a target and compare working forecasts**
-  Becomes usable: The traveler can set a personal minimum rate, return later to find it saved, and compare computed target-reach chances for this month, next month, and the next three full calendar months, with factors and uncertainty.
-  Why now: The forecast depends on the rate history and news already proved in Slice 1; it adds the target input that party rooms will later share.
-  PRD ref: `prd.md > Forecast Cards and News`, `prd.md > Target and Alerts` (solo target)
-  Spec ref: `spec.md > News banner and forecast engine`, `spec.md > Personal target and alert controller`, `spec.md > Data Model`
-  Build: Add the saved personal target; simulate possible paths from historical daily changes; apply a small capped headline-polarity heuristic; render three same-scale pixel meters, Why summaries, links, update times, and uncertainty copy.
-  Verify (mechanical): Run `npm run build`; use sample targets below and above the current rate and confirm all three cards show finite computed percentages and update when the target changes.
-  Learner check: Enter a target, compare the three cards, change the target, and tell me whether the chance meters and “Why?” explanation are understandable.
-  Commit: `Add target likelihood forecasts`
+- [x] **1. Open the rate dashboard and publisher headlines**
+  Becomes usable: Market quote, daily chart/peak/day inspection, source timestamps, theme switch and bounded publisher headlines.
+  Why now: Proves source access and the first usable screen.
+  PRD ref: `prd.md > Rate Dashboard and Graph`, `Forecast Cards and News`, `Currency visuals and cursor`
+  Spec ref: `spec.md > Rate data service and dashboard`, `News banner and forecast engine`, `Currency cursor and banknote background`
+  Build: Retain Twelve Data market quote, Frankfurter history, non-interactive banknotes and theme controls. Replace GDELT with Malaysia, English South Korea and international RSS sections, today plus two previous MYT days, up to 30 each.
+  Verify (mechanical): Production build passes. Browser displayed sourced rates, selected-day readout, peak and publisher sections; theme toggled both ways. Deterministic checks cover news dates, deduplication, topic/count limits and saved-cache retention on failed fetch. No browser warnings/errors observed in the inspected tab. Full network-outage and provider-availability guarantees are not claimed.
+  Learner check: Prior dashboard/appearance feedback is recorded below; final whole-app review remains open.
+  Commit: `Replace headline feeds and prepare submission handoff` (7901093); closeout verification saved with this checklist.
 
-- [ ] **3. Create a room and buzz the travel party**
-  Becomes usable: Two connected browsers can create/join a six-digit room, move avatars between synchronized Seoul Night Watch and Common Room areas, see a shared target, and receive visible, audible Test Alerts and target-crossing alerts, plus browser notifications when permission is granted.
-  Why now: This proves the unique kernel—one rate moment shared by the party—before the Bi-Monthly history controls and the more involved group vote.
-  PRD ref: `prd.md > Party Rooms and Avatars`, `prd.md > Target and Alerts`, `prd.md > States and Boundaries`
-  Spec ref: `spec.md > Party room and avatars`, `spec.md > Personal target and alert controller`, `spec.md > Data Model`, `spec.md > External Services and Dependencies` (Firebase Spark)
-  Build: Add Firebase anonymous sign-in, security rules, room create/join and missing-room prompt, synchronized room locations and avatar scene, shared master target, Test Alert and target-crossing events, browser notification permission, alert sound, and connected-tab repeat timer. Notifications require the page to remain open and connected.
-  Verify (mechanical): Run `npm run build`; with Firebase configured, create a room in one browser and join in another, switch locations and confirm both scenes update, then send a Test Alert and confirm both clients show it and play a sound; confirm browser notifications after granting permission.
-  Learner check: Open two browser windows, create and join a room, move between Seoul Night Watch and Common Room, try an unknown code, change the shared target as master, enable browser alerts, and press Test Alert. Confirm both windows show the shared location and alert; note the sound and browser notification.
-  Commit: `Add shared rooms and synchronized alerts`
+- [x] **2. Set a target and compare working forecasts**
+  Becomes usable: Personal target and three experimental estimates using separate five-year provider histories.
+  Why now: Builds on the rate inputs before shared decisions.
+  PRD ref: `prd.md > Forecast Cards and News`, `Target and Alerts`
+  Spec ref: `spec.md > News banner and forecast engine`, `Five-year simulation revision (9 October 2026)`
+  Build: Preserve local target storage, separate source selection, 2,000 historical paths, three calendar windows, source dates and one shared explanation. Missing news permits history-only estimates.
+  Verify (mechanical): `npm run check:forecast` passes. Browser target 310 produced 100% in all Frankfurter windows; target 340 produced lower finite estimates. Twelve Data selection produced separate estimates. Historical backtests remain documented, with no calibrated-accuracy claim.
+  Learner check: Creator explicitly confirmed forecast target changes work.
+  Commit: Existing forecast checkpoints through 7901093; closeout verification saved with this checklist.
 
-- [ ] **4. Add the Bi-Monthly Rate Surveillance tab**
-  Becomes usable: The Rate Surveillance section has a default 14-day chart and a Bi-Monthly tab for completed two-month periods labeled across 2022–2026, with each period’s daily rates, peak, selected-day details, and clear unavailable/stale states.
-  Why now: This adds historical browsing on top of the verified rate service while keeping the defining party alert kernel earlier in the build.
-  PRD ref: `prd.md > Bi-Monthly Rate Surveillance`, `prd.md > States and Boundaries`
-  Spec ref: `spec.md > Bi-Monthly rate-history tab`, `spec.md > Data Model`, `spec.md > Frankfurter daily reference rates`, `spec.md > Important Failure Modes`
-  Build: Add 14 Days/Bi-Monthly tabs and a slim selector for completed two-month periods labeled across 2022–2026; fetch and align both Frankfurter series for the selected date range; render a horizontally scrollable period graph with peak/day inspection; cache each period separately and retain the last-known response with Refresh on failure.
-  Verify (mechanical): Run `npm run build`; confirm the newest period in October 2026 is Aug–Sep 2026, earlier periods include Jun–Jul and Apr–May, the selector covers years 2022–2026, cross-year labels are clear, the current incomplete period is disabled, and selected data/peak/day details match each full two-month range.
-  Learner check: Open Bi-Monthly, compare Aug–Sep with an earlier two-month period, inspect a day and each period’s peak, then tell me what feels confusing or missing.
-  Commit: `Add Bi-Monthly rate history tab`
+- [x] **3. Create a room and buzz the travel party**
+  Becomes usable: Two clients share a room, target, avatar scene and Test Alert; refresh reads the shared target.
+  Why now: Proves the shared-alert kernel before voting refinements.
+  PRD ref: `prd.md > Party Rooms and Avatars`, `Target and Alerts`
+  Spec ref: `spec.md > Party room and avatars`, `Personal target and alert controller`
+  Build: Retain Firebase anonymous identities, six-digit rooms, shared avatars, presence, alerts and right-aligned refresh. Location controls stay removed. Email remains inactive.
+  Verify (mechanical): Two different origins joined the same room as master/member; both showed two travelers and the same target. Test Alert appeared on the second client. Unknown code 000000 displayed the create-room prompt. Deterministic mocked checks cover target-crossing guards and duplicate suppression. Actual natural market crossing and 90-minute repeat timing were not observed in this session.
+  Learner check: Creator confirmed two-person operation, refresh, Test Alert sound on both devices and enabled browser notifications.
+  Commit: Existing room checkpoints through 7901093; closeout verification saved with this checklist.
 
-- [ ] **5. Change the room target at the roundtable**
-  Becomes usable: Any member can raise a timed target proposal; Follow/Fold/Hold votes resolve as agreed, including timeout, tie, extension/close, and all-Hold revote behavior.
-  Why now: The room and shared target already work, so the final group decision can use real member identities and synchronized room updates.
-  PRD ref: `prd.md > Roundtable Target Changes`, `prd.md > Party Room`, `prd.md > States and Boundaries`
-  Spec ref: `spec.md > Roundtable`, `spec.md > Data Model`, `spec.md > Important Failure Modes`
-  Build: Add proposal creation and duration, member cards/votes, deadline display, one-time resolution, tie controls, and revote prompt for all-Hold.
-  Verify (mechanical): Run `npm run build`; use two connected members to resolve Follow-majority, Fold-majority, tie close/extend, and all-Hold cases without duplicate resolution.
-  Learner check: Raise a short roundtable with a second browser; try one outcome and confirm the target/table result is the one you expect.
-  Commit: `Add timed target roundtable`
+- [x] **4. Browse completed Bi-Monthly history**
+  Becomes usable: Completed two-month history selection with peak, dates and a wide scrollable chart.
+  Why now: Extends the working daily chart.
+  PRD ref: `prd.md > Bi-Monthly Rate Surveillance`
+  Spec ref: `spec.md > Bi-Monthly rate-history tab`
+  Build: Retain 14 Days default, compact period selector, completed pairs and dated chart values.
+  Verify (mechanical): Browser defaulted to 14 Days. Selector listed Aug–Sep 2026 first, earlier periods back to Feb–Mar 2022, and cross-year labels; no incomplete/future period. Aug–Sep and Jun–Jul switched to distinct observed endpoints and peaks. Chart day inspection returned 03 Oct 2026 / 331.406 in the daily view. Full provider history completeness is not claimed.
+  Learner check: Prior graph/selector feedback is incorporated; final whole-app review remains open.
+  Commit: Existing history implementation; closeout verification saved with this checklist.
+
+- [x] **5. Change the room target at the roundtable**
+  Becomes usable: Follow/Fold/Hold decisions synchronize and completed tables disappear.
+  Why now: Uses the verified shared room and member identities.
+  PRD ref: `prd.md > Roundtable Target Changes`, `Current build acceptance amendments — 9 October 2026`
+  Spec ref: `spec.md > Roundtable`
+  Build: Preserve timed proposals, trusted room-master finalization, tie extension/closure, all-Hold revote choices and finished-table dismissal.
+  Verify (mechanical): Live two-client checks passed Follow acceptance (350 → 351), Fold rejection (351 retained), tie extension and closure, all-Hold timeout and synchronized revote choice. Finished tables left Propose New Target on both clients. `npm run check:build` covers pure vote outcomes, proposal bounds and accepted/applied gating. Not a security audit of Firebase rules or exhaustive race test.
+  Learner check: Creator's general two-person confirmation is recorded; final review of this completed behavior remains open.
+  Commit: Existing roundtable implementation through 7901093; closeout verification saved with this checklist.
 
 ## Hands-on Checkpoints
 
-- [x] Early usable behavior explored — after Slice 1, before forecasts and party-room polish
-- [ ] Final kick-the-tires exploration and feedback completed — after all slices
+- [x] Early usable behavior explored — prior dashboard feedback
+- [ ] Final kick-the-tires exploration and feedback completed — current build ready for creator review
 
 ## Final Review
 
-- [ ] Final review complete — feedback resolved and learner confirms ready to ship
+- [ ] Final review complete — creator confirms the current proof of concept is ready to ship
+
+Remaining action: creator reviews the current app and reports any issue or confirms ready. Existing forecast, refresh, two-person room, sound and notification confirmations are retained; do not repeat those questions. No new feature is required for this review. Shipping/publication/license/video are separate.
 
 ## Code Tour and App Map
 
-- [ ] Learning activity complete — guided route, focused alternative, prior practice connected, or brief recap
-- [ ] Optional edit and transfer reflection addressed — offered/declined/already covered/not applicable as appropriate
-- [ ] `devpost/app-map.html` generated from finished code, checked, and shown, including a project-grounded practice to reuse
+- [x] Learning activity complete — brief evidence-based recap of existing target testing and news-failure fix
+- [x] Optional edit and transfer reflection addressed — optional later label edit offered; no edit performed; existing personal reflection retained privately
+- [x] `devpost/app-map.html` generated from code, paths checked and opened, including a reusable practice
 
-Activity and evidence: Static reference map prepared from ForecastCards → estimateForecast → forecast-grid. The forecast/news failure and history-only fallback provide a concrete example for the wrap-up. An interactive tour is not claimed; the learner's supplied reflection is recorded below.
-Route and stops: reference-only route in devpost/app-map.html: src/components/ForecastCards.tsx (forecast-target), src/lib/forecast.ts (estimateForecast), ForecastCards.tsx (forecast-grid).
-Edit outcome: No optional learner code edit in this wrap-up; previous user-directed UI revisions are documented below.
-Reflection: Learner supplied their own inspiration and learning reflection; exact words retained only in the ignored learner profile. No public narrative generated.
-Activity mode: Static reference and project-grounded recap prepared; not an interactive code tour.
+Activity and evidence: Recap connects the creator's target tests to ForecastCards → estimateForecast → forecast-grid. Tests show the computed outputs respond to changed targets; they do not establish real-world predictive accuracy. The unavailable-news fix shows why an optional input should not disable a usable history-only result.
+Route and stops: reference route, not a claimed hands-on tour: src/components/ForecastCards.tsx (forecast-target), src/lib/forecast.ts (estimateForecast), ForecastCards.tsx (forecast-grid).
+Edit outcome: No extra learner code exercise required. An optional label edit can be tried later; none performed here.
+Reflection: The creator's inspiration and learning reflection are retained in the ignored profile. At their explicit later request, the submission draft phrases their shared thoughts and verified project facts for their review.
+Activity mode: Evidence-based recap and static app map, not an interactive code tour.
 
 ## Revisions
 
@@ -127,3 +131,5 @@ Activity mode: Static reference and project-grounded recap prepared; not an inte
 - Shipping-preparation request: learner confirms Shared Target refresh and two-person Signal Room use work, after previously confirming forecast target changes. Record these as user reports, not exhaustive tests. Reviewed official hackathon requirements; no Git remote or project license found. Prepared submission field guide, app map, and unedited dashboard/forecast screenshots. No public deployment, repository creation, upload or submission performed. Formal build completion remains open for remaining verification and final sign-off.
 
 - Learner supplied their own public repository, https://github.com/mansonmyr/ringgitwon. Unauthenticated GitHub API access confirmed public visibility and only README.md / LICENSE present. Remote LICENSE is PolyForm Noncommercial 1.0.0 (GitHub: Other / NOASSERTION); license choice needs resolving against the open-source requirement. No remote license or code was changed. A limited scan of 163 existing Git history blobs found no configured Twelve Data key, standard private-key headers, GitHub-token patterns or AWS-access-key patterns; the learner profile is neither tracked nor in history. This is not a comprehensive publication audit. Production build passed (bundle-size advisory only); no new runtime tests were run.
+
+- Build closeout resumed at creator request. Reconciled obsolete GDELT/monthly-news and room-location criteria against approved changes; recorded current PoC checks in `validation/build-closeout.md`. Creator confirmed sound and enabled browser notifications on both devices. Prepared requested Devpost prose for creator review. Final readiness sign-off remains pending; no claim of completed 5-build or public submission.

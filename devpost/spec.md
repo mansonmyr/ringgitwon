@@ -97,7 +97,7 @@ Implements `prd.md > Bi-Monthly Rate Surveillance`.
 
 ### News banner and forecast engine
 
-Fetches broad finance, policy, conflict, and trade headlines from GDELT, links each result to its publisher, and shows headline/source/date in a scrollable list. Fetch the current calendar month in Kuala Lumpur time; display a single current-month list. Keep every language returned by the source. If a request fails, show saved stories or a clear unavailable message with Refresh; never fill the feed with fabricated headlines. Headlines are marked stale after a day. The forecast engine takes a longer historical rate series, the target, the calendar-window boundaries, and a small, capped headline-polarity score from a transparent keyword list. It resamples consecutive calendar-day returns from the trailing year into simulated paths, using separate pools for each ending weekday (including weekends). Returns spanning missing dates are excluded; each weekday must have at least eight samples or the forecast shows an unavailable message. Holidays are not modeled separately. It estimates the share of paths that touch the target within each window, and adds the same-scale pixel meter and concise factors. News polarity is a basic keyword rule and is labelled heuristic; it may be wrong. Article tone/coverage is context, not evidence that a currency will move that way. If the rate history is older than 3 days, or no fresh news can be fetched and the cache is older than a day, show the refresh action and suppress a current forecast.
+Fetches publisher RSS through `/api/news`: Malay Mail Malaysia, The Korea Times South Korea/Economy/Business, and CNA Business/World. The browser enforces today plus the previous two MYT calendar days and 30 reports per section; international World titles must match the selected topics. Server caching lasts 30 minutes, with per-feed timestamps and saved-report fallback. The forecast independently samples each provider's available trailing five-year history into 2,000 paths, with provider-specific calendars as described in the revisions below. A small, capped headline heuristic is optional. Missing/stale news produces a labelled history-only estimate; stale rate history suppresses current estimates. Cards retain source timestamps; shared statistics and limitations are below them.
 
 Implements `prd.md > Forecast Cards and News`.
 
@@ -115,7 +115,7 @@ Implements `prd.md > Target and Alerts`.
 
 ### Party room and avatars
 
-Creates and joins six-digit rooms, shows the room master, shared target, members, avatars, and room status. Firebase Anonymous Authentication provides a stable member ID in that browser. Room presence uses Firebase connection status and `onDisconnect` cleanup. Members choose between Seoul / Night Watch and Common Room; that choice is stored in Firebase, and all connected clients render each avatar in its selected area. Avatars are selected from a small built-in set or assigned automatically for the first version; names are nicknames typed by the traveler, not verified identities. The room is a shared browser scene with simple stand/walk animations, not a multiplayer game engine. New alert events play a short Web Audio tone and show a browser notification when permission is granted. Permission is requested through a user action; this browser-side approach cannot deliver after the page closes.
+Creates and joins six-digit rooms, shows the room master, shared target, members, avatars, and room status. Firebase Anonymous Authentication provides a stable member ID in that browser. Room presence uses Firebase connection status and `onDisconnect` cleanup. Members appear together in one shared scene; the earlier location field is retained for record compatibility but has no active location control. Avatars are selected from a small built-in set or assigned automatically for the first version; names are nicknames typed by the traveler, not verified identities. The room is a shared browser scene with simple stand/walk animations, not a multiplayer game engine. New alert events play a short Web Audio tone and show a browser notification when permission is granted. Permission is requested through a user action; this browser-side approach cannot deliver after the page closes.
 
 Implements `prd.md > Party Rooms and Avatars`.
 
@@ -172,18 +172,18 @@ project/
 │   ├── lib/
 │   │   ├── firebase.ts            # Firebase setup and anonymous sign-in
 │   │   ├── rates.ts               # Latest and selected-month Frankfurter history, cross-rate, stale cache
-│   │   ├── news.ts                # GDELT query and headline normalization
+│   │   ├── news.ts                # Publisher RSS parsing and bounded headline cache
 │   │   ├── forecast.ts            # Historical-return simulation and news heuristic
 │   │   ├── rooms.ts               # Room creation, joining, presence, subscriptions
 │   │   ├── roundtable.ts          # Vote and outcome rules
-│   │   └── alerts.ts              # Target crossing, test event, repeat timer
+│   │                             # Alert publishing is in rooms.ts; playback/repeats in SignalRoom.tsx
 │   ├── components/
 │   │   ├── RateChart.tsx          # Two-week SVG graph and selected-day tooltip
-│   │   ├── RateHistory.tsx        # Bi-Monthly period tabs and historical graph
+│   │   ├── RateSurveillance.tsx        # Bi-Monthly period tabs and historical graph
 │   │   ├── ForecastCards.tsx      # Three likelihood cards and pixel meters
 │   │   ├── NewsBanner.tsx         # Linked stories and refresh/stale state
-│   │   ├── PartyRoom.tsx          # Room scene, members, target and test alert
-│   │   └── RoundtablePanel.tsx    # Follow/Fold/Hold interaction and timer
+│   │   ├── SignalRoom.tsx          # Room scene, members, target and test alert
+│   │   └── Roundtable.tsx    # Follow/Fold/Hold interaction and timer
 │   └── types.ts                   # Shared TypeScript data shapes
 ├── devpost/
 │   ├── learner-profile.md         # Learner planning record (gitignored)
@@ -206,7 +206,7 @@ project/
 - **Freshness/cost:** Rates update daily (and may be non-business-day old); service describes no daily/monthly cap but rate-limits abuse. These are reference rates, not cash-exchange kiosk quotes or a minute-by-minute Forex feed.
 - **Build check:** Confirm both MYR and KRW are available from the selected sources and share dates. If not, keep the stale-data/unavailable state and test another official-provider route; never fabricate missing rates.
 
-### GDELT DOC news search
+### GDELT DOC news search (retired)
 
 - **Use:** Recent links across global news coverage for the broad subjects in the PRD; no account key in the documented examples. [GDELT DOC API overview and examples](https://blog.gdeltproject.org/gdelt-doc-2-0-api-debuts/).
 - **Requests:** The app requests the current calendar month through the present time with `startdatetime`/`enddatetime`, `maxrecords=250`, and `sort=datedesc`. Keep request starts at least six seconds apart. If the provider fails, show cached current-month headlines or an unavailable state with Refresh.
@@ -230,7 +230,7 @@ project/
 
 ## Important Failure Modes
 
-- **Rate or news request fails / data is stale** → retain the last known rate and timestamp; mark rates stale after 3 calendar days and headlines stale after 24 hours, show Refresh, and hide the forecast if its inputs are not current enough.
+- **Rate or news request fails / data is stale** → retain the last known rate and timestamp; stale rate history suppresses a current estimate. News failure permits a labelled history-only estimate. Show Refresh and preserve actual source timestamps.
 - **MYR/KRW cross-rate is unavailable on a date** → skip that date; if current data cannot be formed from both component rates, show unavailable instead of a made-up value.
 - **Firebase setup, quota, or connection fails** → explain that shared rooms are unavailable, retain solo dashboard use, and show a reconnect/refresh action. Do not pretend room sync worked.
 - **Firebase quota shuts off a free feature** → app shows its last local rate cache and a service-unavailable message; room sync/hosting resumes when the quota resets or the owner changes plans.
@@ -290,3 +290,7 @@ The learner selected email notifications first and explicitly rejected a billing
 At the learner’s request, active news fetching uses fixed publisher RSS endpoints through `/api/news`: Malay Mail Malaysia, The Korea Times South Korea (English), and CNA Business/World. GDELT is removed from the runtime. Vite development/preview provide the route; static deployment needs a backend equivalent. Fetches share a 30-minute server cache, failures retry after one minute, and each feed retains its last successful timestamp. Browser storage preserves up to 30 reports per section from the current and previous two calendar days in Malaysia time (90 total); RSS coverage is rolling, not a full archive. The UI has Malaysia, South Korea and international sections. Unavailable news no longer blocks historical forecasts. Publisher usage rights must be reviewed before public distribution.
 
 International reports are limited to CNA Business and World titles matching business, war, trade-fair or aviation terms. Old cache entries are pruned on read/refresh and every minute while Headlines is mounted; the displayed list uses the same policy. This is a lightweight category/title filter, not semantic classification.
+
+### Build closeout baseline — 9 October 2026
+
+Current acceptance is recorded in the revised checklist and `devpost/validation/build-closeout.md`. Earlier dated provider proposals are historical decisions, superseded by the five-year, quote-timing and publisher-RSS revisions. The source tree uses RateSurveillance, SignalRoom and Roundtable components. Email activation, production backend hosting and public publication remain separate shipping/future work.
