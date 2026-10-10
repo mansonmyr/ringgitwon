@@ -38,7 +38,7 @@ async function send(env, email, subject, text, key) {
   if(!claimed.meta.changes) return false;
   try {
     await limit(env,`daily:${Math.floor(Date.now()/DAY)}`,90,2*DAY);
-    await upstream('https://api.brevo.com/v3/smtp/email',{method:'POST',headers:{'api-key':env.BREVO_API_KEY,'Content-Type':'application/json'},body:JSON.stringify({sender:{name:'RinggitWon',email:env.SENDER_EMAIL},to:[{email}],subject,textContent:text})});
+    await upstream('https://api.brevo.com/v3/smtp/email',{method:'POST',headers:{'api-key':env.BREVO_API_KEY,'Content-Type':'application/json'},body:JSON.stringify({sender:{name:'Won(da) Won',email:env.SENDER_EMAIL},to:[{email}],subject,textContent:text})});
     await sql(env,'UPDATE deliveries SET status=? WHERE key=?','accepted',key).run();
     return true;
   } catch(e) { await sql(env,'UPDATE deliveries SET status=? WHERE key=?','failed-or-unknown',key).run(); throw e; }
@@ -50,7 +50,7 @@ async function notify(env, code, room, kind, event, message) {
     if(!room.members?.[sub.uid] || !(kind==='test'?sub.tests:sub.targets))continue;
     // Recheck subscription immediately before sending; unsubscribe wins queued work.
     if(!await sql(env,'SELECT id FROM subscriptions WHERE id=? AND confirmed=1',sub.id).first())continue;
-    const accepted=await send(env,sub.email,`RinggitWon · ${kind==='test'?'test alert':'target reached'}`,`${message}\n\nRoom ${code}. This is an indicative market rate, not a cash-exchange offer.\n\nStop these emails: ${env.PUBLIC_URL}/unsubscribe?token=${sub.unsubscribe_token}`,`${event}:${sub.id}`);
+    const accepted=await send(env,sub.email,`Won(da) Won · ${kind==='test'?'test alert':'target reached'}`,`${message}\n\nRoom ${code}. This is an indicative market rate, not a cash-exchange offer.\n\nStop these emails: ${env.PUBLIC_URL}/unsubscribe?token=${sub.unsubscribe_token}`,`${event}:${sub.id}`);
     if(accepted)count++;
   }
   return count;
@@ -72,7 +72,7 @@ async function publicLink(request, env, url) {
     return new Response(isConfirm?'Email verified. Return to Signal Room and choose Check status.':'Email notifications stopped and your subscription deleted.',{headers:{'Content-Type':'text/plain; charset=utf-8','Cache-Control':'no-store'}});
   }
   // GET renders a confirmation form; mail scanners cannot activate/remove subscriptions.
-  return new Response(`<!doctype html><html><meta name="viewport" content="width=device-width"><title>RinggitWon email</title><body><h1>${isConfirm?'Confirm email alerts':'Stop email alerts'}</h1><p>${isConfirm?'Confirm that you requested Signal Room emails.':'This will remove your email subscription for this room.'}</p><form method="POST"><input type="hidden" name="token" value="${value}"><button>${isConfirm?'Confirm subscription':'Unsubscribe'}</button></form></body></html>`,{headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store','Referrer-Policy':'no-referrer','Content-Security-Policy':"default-src 'none'; form-action 'self'; frame-ancestors 'none'"}});
+  return new Response(`<!doctype html><html><meta name="viewport" content="width=device-width"><title>Won(da) Won email</title><body><h1>${isConfirm?'Confirm email alerts':'Stop email alerts'}</h1><p>${isConfirm?'Confirm that you requested Signal Room emails.':'This will remove your email subscription for this room.'}</p><form method="POST"><input type="hidden" name="token" value="${value}"><button>${isConfirm?'Confirm subscription':'Unsubscribe'}</button></form></body></html>`,{headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store','Referrer-Policy':'no-referrer','Content-Security-Policy':"default-src 'none'; form-action 'self'; frame-ancestors 'none'"}});
 }
 async function api(request, env, url) {
   if(!configured(env))throw new Problem('Email delivery has not been connected yet.',503);
@@ -104,7 +104,7 @@ async function api(request, env, url) {
     const id=crypto.randomUUID(), confirmation=token(), unsubscribe=token();
     // Replacing email/preferences always requires a fresh confirmation.
     await sql(env,`INSERT INTO subscriptions(id,room,uid,room_epoch,email,targets,tests,confirm_hash,expires,unsubscribe_token,created) VALUES(?,?,?,?,?,?,?,?,?,?,?) ON CONFLICT(room,uid) DO UPDATE SET id=excluded.id,room_epoch=excluded.room_epoch,email=excluded.email,targets=excluded.targets,tests=excluded.tests,confirm_hash=excluded.confirm_hash,expires=excluded.expires,unsubscribe_token=excluded.unsubscribe_token,created=excluded.created,confirmed=0`,id,code,uid,room.createdAt,email,Number(data.targets===true),Number(data.tests===true),await hash(confirmation),Date.now()+DAY,unsubscribe,Date.now()).run();
-    await send(env,email,'Confirm your RinggitWon email alerts',`You requested emails for Signal Room ${code}.\n\nConfirm within 24 hours: ${env.PUBLIC_URL}/confirm?token=${confirmation}\n\nAlerts selected: ${data.targets?'target reached ':''}${data.tests?'room test alerts':''}.\nIf this was not you, ignore this email or remove the request: ${env.PUBLIC_URL}/unsubscribe?token=${unsubscribe}`,`verify:${id}`);
+    await send(env,email,'Confirm your Won(da) Won email alerts',`You requested emails for Signal Room ${code}.\n\nConfirm within 24 hours: ${env.PUBLIC_URL}/confirm?token=${confirmation}\n\nAlerts selected: ${data.targets?'target reached ':''}${data.tests?'room test alerts':''}.\nIf this was not you, ignore this email or remove the request: ${env.PUBLIC_URL}/unsubscribe?token=${unsubscribe}`,`verify:${id}`);
     return json({message:'Confirmation email accepted by the email service. Check your inbox and spam folder; then choose Check status.'});
   }
   if(url.pathname==='/test') {

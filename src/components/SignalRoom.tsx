@@ -209,7 +209,7 @@ export function SignalRoom({ rate: latest }: { rate: RoomRate | null }) {
     const permission = Notification.permission === 'granted' ? 'granted' : await Notification.requestPermission();
     setNotificationPermission(permission);
     setNotificationMessage(permission === 'granted'
-      ? 'Browser alerts are enabled for this device while RinggitWon is open.'
+      ? 'Browser alerts are enabled for this device while Won(da) Won is open.'
       : 'Allow notifications in the browser prompt to receive browser alerts.');
   }
 

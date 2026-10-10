@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f2eb">
+  <title>Scope — MYR→KRW Travel Rate Party</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #152d37;
+      --muted: #587078;
+      --paper: #f5f2eb;
+      --card: #fffdf8;
+      --line: #d9e0dc;
+      --teal: #087e78;
+      --teal-soft: #dcefeb;
+      --coral: #c6684b;
+      --coral-soft: #f7e6dc;
+      --gold: #b27d25;
+      --shadow: 0 18px 55px rgba(21, 45, 55, .08);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 92% 5%, rgba(8, 126, 120, .09), transparent 25rem),
+        var(--paper);
+      color: var(--ink);
+      font: 16px/1.58 ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    a { color: var(--teal); }
+    .wrap { width: min(1060px, calc(100% - 40px)); margin: 0 auto; padding: 36px 0 72px; }
+    .eyebrow { color: var(--teal); font-size: .76rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+    header { padding: 18px 0 30px; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { max-width: 760px; margin: 10px 0 12px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(2.35rem, 6vw, 4.6rem); font-weight: 500; letter-spacing: -.045em; line-height: 1.02; }
+    .dek { max-width: 700px; margin: 0; color: var(--muted); font-size: 1.12rem; }
+    .meta { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 22px; }
+    .pill { display: inline-flex; align-items: center; gap: 7px; padding: 6px 11px; border: 1px solid var(--line); border-radius: 999px; background: rgba(255,253,248,.72); color: var(--muted); font-size: .82rem; }
+    .pill strong { color: var(--ink); }
+    .card { border: 1px solid var(--line); border-radius: 20px; background: var(--card); box-shadow: var(--shadow); }
+    .diagram-card { overflow: hidden; margin: 12px 0 26px; }
+    .section-head { display: flex; align-items: end; justify-content: space-between; gap: 18px; padding: 22px 26px 0; }
+    .section-head h2 { margin: 0; font: 500 1.55rem/1.2 Georgia, "Times New Roman", serif; }
+    .section-head p { max-width: 420px; margin: 0; color: var(--muted); font-size: .88rem; }
+    .diagram { display: block; width: 100%; height: auto; padding: 10px 16px 0; }
+    .diagram-mobile { display: none; }
+    .diagram-caption { margin: 0; padding: 0 26px 22px; color: var(--muted); font-size: .84rem; }
+    .fallback { margin: 0 26px 22px; padding: 12px 15px; border-left: 3px solid var(--teal); background: #f1f7f4; color: var(--muted); font-size: .88rem; }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    .copy-card { padding: 23px 25px; }
+    .copy-card h2 { margin-bottom: 10px; font: 500 1.45rem/1.2 Georgia, "Times New Roman", serif; }
+    .copy-card p:last-child, .copy-card ul:last-child { margin-bottom: 0; }
+    .copy-card p, .copy-card li { color: #344f57; }
+    .copy-card ul { padding-left: 20px; }
+    .highlight { border-top: 4px solid var(--teal); }
+    .why { border-top: 4px solid var(--coral); }
+    .boundary { margin-top: 16px; padding: 24px 26px; }
+    .boundary h2 { margin-bottom: 6px; font: 500 1.55rem/1.2 Georgia, "Times New Roman", serif; }
+    .boundary > p { color: var(--muted); }
+    .scope-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 18px 0 0; padding: 0; list-style: none; }
+    .scope-list li { display: flex; gap: 10px; padding: 12px 13px; border-radius: 12px; background: #f2f7f4; color: #344f57; }
+    .check { flex: 0 0 auto; color: var(--teal); font-weight: 900; }
+    .reveals { display: grid; gap: 10px; margin-top: 16px; }
+    details { border: 1px solid var(--line); border-radius: 15px; background: var(--card); }
+    summary { display: flex; align-items: center; gap: 11px; padding: 17px 20px; cursor: pointer; font-weight: 750; list-style: none; }
+    summary::-webkit-details-marker { display: none; }
+    summary::after { content: "+"; margin-left: auto; color: var(--teal); font-size: 1.35rem; font-weight: 500; }
+    details[open] summary::after { content: "−"; }
+    .summary-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--teal); }
+    .later .summary-dot { background: var(--gold); }
+    .cut .summary-dot { background: var(--coral); }
+    .details-body { padding: 0 22px 18px 41px; color: #435c63; }
+    .details-body ul { margin: 0; padding-left: 19px; }
+    .details-body p:last-child { margin-bottom: 0; }
+    footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; margin-top: 23px; padding: 0 4px; color: var(--muted); font-size: .82rem; }
+    @media (max-width: 700px) {
+      .wrap { width: min(100% - 24px, 580px); padding-top: 22px; }
+      .grid, .scope-list { grid-template-columns: 1fr; }
+      .section-head { display: block; padding: 19px 19px 0; }
+      .section-head p { margin-top: 7px; }
+      .diagram-desktop { display: none; }
+      .diagram-mobile { display: block; }
+      .diagram { padding: 5px 8px 0; }
+      .diagram-caption { padding: 0 19px 18px; }
+      .fallback { margin: 0 19px 18px; }
+      .copy-card, .boundary { padding: 20px; }
+    }
+    @media (prefers-reduced-motion: no-preference) {
+      details .details-body { animation: reveal .18s ease-out; }
+      @keyframes reveal { from { opacity: .4; transform: translateY(-3px); } to { opacity: 1; transform: translateY(0); } }
+    }
+    @media print {
+      body { background: white; }
+      .wrap { width: 100%; padding: 0; }
+      .card, details { box-shadow: none; break-inside: avoid; }
+      details .details-body { display: block !important; }
+      summary::after { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header>
+      <div class="eyebrow">Build With AI · Scope draft</div>
+      <h1>MYR→KRW<br>Travel Rate Party</h1>
+      <p class="dek">A deployable web app for travelers to watch a target exchange rate, understand the uncertain outlook, and coordinate the moment with their travel party.</p>
+      <div class="meta">
+        <span class="pill"><strong>First pair</strong> MYR / KRW</span>
+        <span class="pill"><strong>For</strong> Malaysian travelers</span>
+        <span class="pill"><strong>Status</strong> Approved scope</span>
+      </div>
+    </header>
+
+    <section class="card diagram-card" aria-labelledby="map-title">
+      <div class="section-head">
+        <h2 id="map-title">From target to shared moment</h2>
+        <p>The distinctive loop is a travel party acting together when the exchange rate reaches its target.</p>
+      </div>
+      <svg class="diagram diagram-desktop" viewBox="0 0 1000 270" role="img" aria-labelledby="diagram-title diagram-desc">
+        <title id="diagram-title">Traveler, rate and forecast, party alert, and proof</title>
+        <desc id="diagram-desc">A traveler sets a MYR to KRW target and chooses a forecast window. Live rate and news signals inform an uncertain target likelihood. When the target is reached, connected party members receive an in-app buzz. A Test Alert guarantees the demo can show the shared buzz.</desc>
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#87a39f"/></marker>
+        </defs>
+        <path d="M220 125 H275 M470 125 H525 M720 125 H775" fill="none" stroke="#87a39f" stroke-width="2.2" marker-end="url(#arrow)"/>
+        <path d="M375 185 C375 235 620 235 620 185" fill="none" stroke="#c6684b" stroke-width="2" stroke-dasharray="6 6" marker-end="url(#arrow)"/>
+        <rect x="25" y="58" width="195" height="132" rx="18" fill="#f1f7f4" stroke="#c6ded8"/>
+        <circle cx="57" cy="91" r="13" fill="#087e78"/><text x="57" y="96" fill="white" text-anchor="middle" font-size="13" font-weight="700">1</text>
+        <text x="80" y="96" fill="#152d37" font-size="17" font-weight="700">Traveler</text>
+        <text x="44" y="128" fill="#587078" font-size="13">Chooses MYR → KRW</text>
+        <text x="44" y="151" fill="#587078" font-size="13">Sets a target + time window</text>
+        <rect x="275" y="58" width="195" height="132" rx="18" fill="#eef5f7" stroke="#c9dce2"/>
+        <circle cx="307" cy="91" r="13" fill="#477a8b"/><text x="307" y="96" fill="white" text-anchor="middle" font-size="13" font-weight="700">2</text>
+        <text x="330" y="96" fill="#152d37" font-size="17" font-weight="700">Rate + outlook</text>
+        <text x="294" y="128" fill="#587078" font-size="13">Live rate and news signals</text>
+        <text x="294" y="151" fill="#587078" font-size="13">Estimate with uncertainty</text>
+        <rect x="525" y="58" width="195" height="132" rx="18" fill="#fbf3df" stroke="#ead9b7"/>
+        <circle cx="557" cy="91" r="13" fill="#b27d25"/><text x="557" y="96" fill="white" text-anchor="middle" font-size="13" font-weight="700">3</text>
+        <text x="580" y="96" fill="#152d37" font-size="17" font-weight="700">Party room</text>
+        <text x="544" y="128" fill="#587078" font-size="13">Test Alert or target reached</text>
+        <text x="544" y="151" fill="#587078" font-size="13">Connected members get a buzz</text>
+        <rect x="775" y="58" width="195" height="132" rx="18" fill="#f7e9e2" stroke="#ecd0c3"/>
+        <circle cx="807" cy="91" r="13" fill="#c6684b"/><text x="807" y="96" fill="white" text-anchor="middle" font-size="13" font-weight="700">4</text>
+        <text x="830" y="96" fill="#152d37" font-size="17" font-weight="700">Proof</text>
+        <text x="794" y="128" fill="#587078" font-size="13">Public link, real pair</text>
+        <text x="794" y="151" fill="#587078" font-size="13">A visible shared alert</text>
+        <text x="497" y="246" fill="#9a5743" text-anchor="middle" font-size="12" font-weight="700">Test Alert makes the group moment demonstrable on demand</text>
+      </svg>
+      <svg class="diagram diagram-mobile" viewBox="0 0 360 635" role="img" aria-labelledby="diagram-mobile-title diagram-mobile-desc">
+        <title id="diagram-mobile-title">Traveler, rate and forecast, party alert, and proof</title>
+        <desc id="diagram-mobile-desc">A traveler sets a MYR to KRW target and forecast window. Live rate and news inform an uncertain target likelihood. A shared party room alert follows when the target is reached, while Test Alert guarantees a demo moment.</desc>
+        <defs><marker id="arrow-m" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#87a39f"/></marker></defs>
+        <path d="M180 143 V177 M180 287 V321 M180 431 V465" fill="none" stroke="#87a39f" stroke-width="2.2" marker-end="url(#arrow-m)"/>
+        <rect x="35" y="27" width="290" height="116" rx="18" fill="#f1f7f4" stroke="#c6ded8"/>
+        <circle cx="68" cy="60" r="13" fill="#087e78"/><text x="68" y="65" fill="white" text-anchor="middle" font-size="13" font-weight="700">1</text>
+        <text x="92" y="65" fill="#152d37" font-size="17" font-weight="700">Traveler</text>
+        <text x="55" y="96" fill="#587078" font-size="13">Chooses MYR → KRW, a target,</text><text x="55" y="117" fill="#587078" font-size="13">and a forecast window</text>
+        <rect x="35" y="177" width="290" height="110" rx="18" fill="#eef5f7" stroke="#c9dce2"/>
+        <circle cx="68" cy="210" r="13" fill="#477a8b"/><text x="68" y="215" fill="white" text-anchor="middle" font-size="13" font-weight="700">2</text>
+        <text x="92" y="215" fill="#152d37" font-size="17" font-weight="700">Rate + outlook</text>
+        <text x="55" y="248" fill="#587078" font-size="13">Live rate and news inform an</text><text x="55" y="269" fill="#587078" font-size="13">estimate with uncertainty</text>
+        <rect x="35" y="321" width="290" height="110" rx="18" fill="#fbf3df" stroke="#ead9b7"/>
+        <circle cx="68" cy="354" r="13" fill="#b27d25"/><text x="68" y="359" fill="white" text-anchor="middle" font-size="13" font-weight="700">3</text>
+        <text x="92" y="359" fill="#152d37" font-size="17" font-weight="700">Party room</text>
+        <text x="55" y="392" fill="#587078" font-size="13">Test Alert or target hit buzzes</text><text x="55" y="413" fill="#587078" font-size="13">connected members together</text>
+        <rect x="35" y="465" width="290" height="110" rx="18" fill="#f7e9e2" stroke="#ecd0c3"/>
+        <circle cx="68" cy="498" r="13" fill="#c6684b"/><text x="68" y="503" fill="white" text-anchor="middle" font-size="13" font-weight="700">4</text>
+        <text x="92" y="503" fill="#152d37" font-size="17" font-weight="700">Demo proof</text>
+        <text x="55" y="536" fill="#587078" font-size="13">Public link, live pair, visible</text><text x="55" y="557" fill="#587078" font-size="13">shared alert on demand</text>
+        <text x="180" y="611" fill="#9a5743" text-anchor="middle" font-size="11" font-weight="700">Test Alert guarantees the shared moment</text>
+      </svg>
+      <p class="diagram-caption">One traveler sets the intention; rate and outlook add context; the party acts together. A test signal proves the group alert even if the live market doesn’t reach the chosen target during the demo.</p>
+      <p class="fallback"><strong>Diagram in words:</strong> Traveler sets a MYR/KRW target and forecast window → live rate and news inform an uncertain estimate → connected party members get a shared buzz at a test or target event → a public demo link shows the flow.</p>
+    </section>
+
+    <section class="grid" aria-label="Project summary">
+      <article class="card copy-card highlight">
+        <h2>The kernel</h2>
+        <p>It turns a good exchange rate into a shared moment: a traveler sets a target, and their travel party can get the same “right now!” buzz when it arrives. The forecast adds context about whether the group may reach that target this month, next month, or within three months.</p>
+      </article>
+      <article class="card copy-card">
+        <h2>Who it’s for</h2>
+        <p>Students and busy office workers in Malaysia planning a South Korean holiday with friends or family. They want to exchange money at a rate they like but may not have time to keep checking it manually.</p>
+      </article>
+      <article class="card copy-card why">
+        <h2>Why it matters</h2>
+        <p>This would be the learner’s first working, small-production-grade app, with the hope of deploying it for people to use. Their learning goal: “getting the app working.”</p>
+      </article>
+      <article class="card copy-card">
+        <h2>What working looks like</h2>
+        <p>A public link shows the real MYR/KRW rate, a default two-week graph, a Bi-Monthly tab with completed two-month periods labeled across 2022–2026, and a scrollable three-month headline feed divided into month tabs. Travelers can set a target and compare uncertain forecasts; a party room lets connected members receive a shared Test Alert and an alert on a real target crossing.</p>
+      </article>
+    </section>
+
+    <section class="card boundary" aria-labelledby="boundary-title">
+      <h2 id="boundary-title">The proof-of-concept boundary</h2>
+      <p>Keep the first build focused on one travel pair and one coordinated alert loop.</p>
+      <ul class="scope-list">
+        <li><span class="check">✓</span><span>Deployable web app focused on MYR/KRW.</span></li>
+        <li><span class="check">✓</span><span>Live exchange-rate feed and one user-set target.</span></li>
+        <li><span class="check">✓</span><span>Bi-Monthly Rate Surveillance tab with completed two-month periods labeled across 2022–2026.</span></li>
+        <li><span class="check">✓</span><span>Scrollable linked headlines with tabs for the latest three calendar months.</span></li>
+        <li><span class="check">✓</span><span>Working likelihood estimate for this month, next month, and the next three months, using exchange-rate and international-news information.</span></li>
+        <li><span class="check">✓</span><span>Party room with synchronized in-app alerts for connected members; Test Alert and target-reached alert.</span></li>
+        <li><span class="check">✓</span><span>Small snapshot-matched cursor on clickable controls; actual moving Ringgit/Won banknotes; saved dark/light inverse-color switch.</span></li>
+      </ul>
+      <div class="reveals">
+        <details class="now" open>
+          <summary><span class="summary-dot"></span>Now · Build the core loop</summary>
+          <div class="details-body"><ul><li>One MYR/KRW pair and a live rate.</li><li>Traveler enters a target and sees estimated likelihood across the three agreed horizons, with contributing factors and uncertainty.</li><li>Connected party members receive a synchronized in-app buzz; Test Alert guarantees a demo moment.</li><li>Deploy a public web link and demonstrate the live monitor. A natural target crossing is welcome, but not required to prove the alert flow.</li></ul></div>
+        </details>
+        <details class="later">
+          <summary><span class="summary-dot"></span>Later · Expand the product</summary>
+          <div class="details-body"><ul><li>More currency pairs and destinations.</li><li>Push notifications when the app is closed or a participant is offline.</li><li>Further validate and improve forecasts, and harden reliability for a wider public audience.</li></ul></div>
+        </details>
+        <details class="cut">
+          <summary><span class="summary-dot"></span>Explicitly cut</summary>
+          <div class="details-body"><p>No other feature has been explicitly cut yet.</p></div>
+        </details>
+      </div>
+    </section>
+
+    <footer>
+      <span>Scope approved · Markdown remains canonical.</span>
+      <span>MYR→KRW · Travel rate party</span>
+    </footer>
+  </main>
+</body>
+</html>

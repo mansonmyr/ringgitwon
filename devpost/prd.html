@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f2eb">
+  <title>Product plan — MYR→KRW Travel Rate Party</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #172f39;
+      --muted: #5c7278;
+      --paper: #f5f2eb;
+      --card: #fffdf8;
+      --line: #d9e0dc;
+      --teal: #087e78;
+      --teal-soft: #e4f1eb;
+      --blue: #477a8b;
+      --gold: #b27d25;
+      --gold-soft: #fbf2dc;
+      --coral: #c6684b;
+      --coral-soft: #f7e6dc;
+      --shadow: 0 18px 55px rgba(23, 47, 57, .08);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: radial-gradient(circle at 93% 4%, rgba(8,126,120,.09), transparent 25rem), var(--paper);
+      color: var(--ink);
+      font: 16px/1.56 ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    .wrap { width: min(1080px, calc(100% - 40px)); margin: 0 auto; padding: 34px 0 70px; }
+    .eyebrow { color: var(--teal); font-size: .75rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { max-width: 820px; margin: 10px 0 12px; font: 500 clamp(2.3rem, 6vw, 4.4rem)/1.02 Georgia, "Times New Roman", serif; letter-spacing: -.045em; }
+    .dek { max-width: 750px; color: var(--muted); font-size: 1.1rem; }
+    .meta { display: flex; flex-wrap: wrap; gap: 9px; margin: 20px 0 30px; }
+    .pill { padding: 6px 11px; border: 1px solid var(--line); border-radius: 999px; background: rgba(255,253,248,.8); color: var(--muted); font-size: .82rem; }
+    .pill strong { color: var(--ink); }
+    .card { border: 1px solid var(--line); border-radius: 20px; background: var(--card); box-shadow: var(--shadow); }
+    .journey { overflow: hidden; margin-bottom: 22px; }
+    .head { display: flex; align-items: end; justify-content: space-between; gap: 18px; padding: 22px 25px 0; }
+    .head h2 { margin: 0; font: 500 1.55rem/1.2 Georgia, "Times New Roman", serif; }
+    .head p { max-width: 440px; margin: 0; color: var(--muted); font-size: .87rem; }
+    svg { display: block; width: 100%; height: auto; }
+    .journey-svg { padding: 12px 18px 0; }
+    .mobile { display: none; }
+    .caption { padding: 0 25px 18px; color: var(--muted); font-size: .85rem; }
+    .fallback { margin: 0 25px 21px; padding: 11px 14px; border-left: 3px solid var(--teal); background: #f1f7f4; color: var(--muted); font-size: .87rem; }
+    .section-title { margin: 30px 0 12px; font: 500 1.8rem/1.2 Georgia, "Times New Roman", serif; }
+    .intro { margin-bottom: 14px; color: var(--muted); }
+    .reveal-list { display: grid; gap: 11px; }
+    details { border: 1px solid var(--line); border-radius: 16px; background: var(--card); }
+    summary { display: flex; align-items: center; gap: 12px; padding: 17px 20px; cursor: pointer; list-style: none; font-weight: 760; }
+    summary::-webkit-details-marker { display: none; }
+    summary::after { content: "+"; margin-left: auto; color: var(--teal); font-size: 1.3rem; font-weight: 500; }
+    details[open] summary::after { content: "−"; }
+    .badge { display: inline-grid; width: 29px; height: 29px; place-items: center; border-radius: 9px; background: var(--teal-soft); color: var(--teal); font-size: .79rem; font-weight: 850; }
+    .forecast .badge { background: #e5eff3; color: var(--blue); }
+    .party .badge { background: var(--gold-soft); color: var(--gold); }
+    .round .badge { background: var(--coral-soft); color: var(--coral); }
+    .detail-body { padding: 0 22px 20px 61px; color: #3e575f; }
+    .detail-body h3 { margin: 14px 0 7px; font-size: 1rem; }
+    .detail-body p { margin-bottom: 8px; }
+    .detail-body ul { margin: 7px 0 14px; padding-left: 20px; }
+    .checks { display: grid; gap: 7px; margin-top: 12px; }
+    .check { display: flex; gap: 10px; padding: 9px 11px; border-radius: 10px; background: #f2f7f4; font-size: .9rem; }
+    .tick { flex: 0 0 auto; color: var(--teal); font-weight: 900; }
+    .states { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 12px; }
+    .state { padding: 15px; border: 1px solid var(--line); border-radius: 13px; background: #fbfaf5; }
+    .state strong { display: block; margin-bottom: 5px; color: var(--ink); }
+    .state span { color: var(--muted); font-size: .9rem; }
+    .bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 22px; }
+    .bottom-card { padding: 20px 22px; }
+    .bottom-card h2 { margin-bottom: 10px; font: 500 1.35rem/1.2 Georgia, "Times New Roman", serif; }
+    .bottom-card ul { margin: 0; padding-left: 19px; color: #3e575f; }
+    .bottom-card li + li { margin-top: 7px; }
+    .decision { border-top: 4px solid var(--teal); }
+    .deferred { border-top: 4px solid var(--gold); }
+    .feedback { margin-top: 18px; padding: 18px 21px; border-radius: 15px; background: #eaf3f0; color: #31554f; }
+    .feedback strong { color: #164b45; }
+    footer { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-top: 24px; color: var(--muted); font-size: .82rem; }
+    @media (max-width: 720px) {
+      .wrap { width: min(100% - 24px, 580px); padding-top: 23px; }
+      .head { display: block; padding: 19px 18px 0; }
+      .head p { margin-top: 7px; }
+      .desktop { display: none; }
+      .mobile { display: block; }
+      .journey-svg { padding: 5px 8px 0; }
+      .caption { padding: 0 18px 17px; }
+      .fallback { margin: 0 18px 18px; }
+      .states, .bottom-grid { grid-template-columns: 1fr; }
+      .detail-body { padding-left: 20px; }
+    }
+    @media (prefers-reduced-motion: no-preference) {
+      details .detail-body { animation: reveal .18s ease-out; }
+      @keyframes reveal { from { opacity: .45; transform: translateY(-3px); } to { opacity: 1; transform: translateY(0); } }
+    }
+    @media print {
+      body { background: white; }
+      .wrap { width: 100%; padding: 0; }
+      .card, details { box-shadow: none; break-inside: avoid; }
+      details .detail-body { display: block !important; }
+      summary::after { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header>
+      <div class="eyebrow">Build With AI · Product definition draft</div>
+      <h1>MYR→KRW Travel Rate Party</h1>
+      <p class="dek">A public web app for Malaysian travelers to track a two-week rate graph, browse completed two-month periods labeled across 2022–2026, read a scrollable three-month news feed, compare uncertain forecasts, and coordinate with their travel party.</p>
+      <div class="meta">
+        <span class="pill"><strong>Scope</strong> MYR / KRW</span>
+        <span class="pill"><strong>Audience</strong> Malaysian travelers to South Korea</span>
+        <span class="pill"><strong>Status</strong> Approved product plan</span>
+      </div>
+    </header>
+
+    <section class="card journey" aria-labelledby="journey-title">
+      <div class="head">
+        <h2 id="journey-title">The journey, end to end</h2>
+        <p>Scope said “follow a target and buzz the party.” Now the dashboard, forecast, room, and vote outcome are defined.</p>
+      </div>
+      <svg class="journey-svg desktop" viewBox="0 0 1000 300" role="img" aria-labelledby="j-title j-desc">
+        <title id="j-title">Dashboard to shared exchange-rate alert</title>
+        <desc id="j-desc">The traveler inspects the 14-day MYR/KRW graph, compares three forecast cards, creates or joins a six-digit party room, and receives an alert when the target is reached. The party can use a timed Follow, Fold, Hold roundtable to change its shared target.</desc>
+        <defs><marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#91aaa5"/></marker></defs>
+        <path d="M225 112 H275 M475 112 H525 M725 112 H775" stroke="#91aaa5" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+        <path d="M625 188 C625 250 375 250 375 188" stroke="#c6684b" stroke-width="2" stroke-dasharray="6 6" fill="none" marker-end="url(#arr)"/>
+        <rect x="25" y="54" width="200" height="134" rx="18" fill="#eef6f2" stroke="#c6ded8"/>
+        <circle cx="57" cy="88" r="13" fill="#087e78"/><text x="57" y="93" fill="white" font-size="13" text-anchor="middle" font-weight="700">1</text>
+        <text x="80" y="93" fill="#172f39" font-size="17" font-weight="700">Dashboard</text>
+        <text x="45" y="125" fill="#5c7278" font-size="13">14-day graph + peak</text><text x="45" y="148" fill="#5c7278" font-size="13">Current MYR/KRW value</text>
+        <rect x="275" y="54" width="200" height="134" rx="18" fill="#edf4f7" stroke="#c9dce2"/>
+        <circle cx="307" cy="88" r="13" fill="#477a8b"/><text x="307" y="93" fill="white" font-size="13" text-anchor="middle" font-weight="700">2</text>
+        <text x="330" y="93" fill="#172f39" font-size="17" font-weight="700">Forecast</text>
+        <text x="295" y="125" fill="#5c7278" font-size="13">Three time windows</text><text x="295" y="148" fill="#5c7278" font-size="13">Likelihood + “Why?”</text>
+        <rect x="525" y="54" width="200" height="134" rx="18" fill="#fbf3df" stroke="#ead9b7"/>
+        <circle cx="557" cy="88" r="13" fill="#b27d25"/><text x="557" y="93" fill="white" font-size="13" text-anchor="middle" font-weight="700">3</text>
+        <text x="580" y="93" fill="#172f39" font-size="17" font-weight="700">Party room</text>
+        <text x="545" y="125" fill="#5c7278" font-size="13">Six-digit join number</text><text x="545" y="148" fill="#5c7278" font-size="13">Avatars + shared target</text>
+        <rect x="775" y="54" width="200" height="134" rx="18" fill="#f7e9e2" stroke="#ecd0c3"/>
+        <circle cx="807" cy="88" r="13" fill="#c6684b"/><text x="807" y="93" fill="white" font-size="13" text-anchor="middle" font-weight="700">4</text>
+        <text x="830" y="93" fill="#172f39" font-size="17" font-weight="700">Alert</text>
+        <text x="795" y="125" fill="#5c7278" font-size="13">Live target or test</text><text x="795" y="148" fill="#5c7278" font-size="13">Connected party buzzes</text>
+        <rect x="340" y="225" width="320" height="46" rx="14" fill="#fff9ee" stroke="#ead9b7"/>
+        <text x="500" y="245" fill="#172f39" font-size="13" font-weight="700" text-anchor="middle">Target change? Timed roundtable:</text>
+        <text x="500" y="261" fill="#5c7278" font-size="12" text-anchor="middle">Follow / Fold / Hold → update or keep the target</text>
+      </svg>
+      <svg class="journey-svg mobile" viewBox="0 0 360 700" role="img" aria-labelledby="jm-title jm-desc">
+        <title id="jm-title">Dashboard to shared exchange-rate alert</title>
+        <desc id="jm-desc">The traveler inspects the rate, compares three forecasts, joins a party room, and the connected group gets an alert when target is reached. A roundtable lets the group change its target.</desc>
+        <defs><marker id="arrm" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#91aaa5"/></marker></defs>
+        <path d="M180 145 V178 M180 288 V321 M180 431 V464" stroke="#91aaa5" stroke-width="2" fill="none" marker-end="url(#arrm)"/>
+        <rect x="35" y="28" width="290" height="117" rx="17" fill="#eef6f2" stroke="#c6ded8"/><circle cx="68" cy="61" r="13" fill="#087e78"/><text x="68" y="66" fill="white" text-anchor="middle" font-size="13" font-weight="700">1</text><text x="92" y="66" fill="#172f39" font-size="17" font-weight="700">Dashboard</text><text x="55" y="100" fill="#5c7278" font-size="13">14-day MYR/KRW graph + peak</text><text x="55" y="121" fill="#5c7278" font-size="13">Current rate and news</text>
+        <rect x="35" y="178" width="290" height="110" rx="17" fill="#edf4f7" stroke="#c9dce2"/><circle cx="68" cy="211" r="13" fill="#477a8b"/><text x="68" y="216" fill="white" text-anchor="middle" font-size="13" font-weight="700">2</text><text x="92" y="216" fill="#172f39" font-size="17" font-weight="700">Forecast</text><text x="55" y="250" fill="#5c7278" font-size="13">Three windows, likelihood</text><text x="55" y="271" fill="#5c7278" font-size="13">and linked “Why?” factors</text>
+        <rect x="35" y="321" width="290" height="110" rx="17" fill="#fbf3df" stroke="#ead9b7"/><circle cx="68" cy="354" r="13" fill="#b27d25"/><text x="68" y="359" fill="white" text-anchor="middle" font-size="13" font-weight="700">3</text><text x="92" y="359" fill="#172f39" font-size="17" font-weight="700">Party room</text><text x="55" y="393" fill="#5c7278" font-size="13">Six-digit join number, avatars</text><text x="55" y="414" fill="#5c7278" font-size="13">and shared target</text>
+        <rect x="35" y="464" width="290" height="110" rx="17" fill="#f7e9e2" stroke="#ecd0c3"/><circle cx="68" cy="497" r="13" fill="#c6684b"/><text x="68" y="502" fill="white" text-anchor="middle" font-size="13" font-weight="700">4</text><text x="92" y="502" fill="#172f39" font-size="17" font-weight="700">Alert + roundtable</text><text x="55" y="536" fill="#5c7278" font-size="13">Live/test buzz; Follow/Fold/Hold</text><text x="55" y="557" fill="#5c7278" font-size="13">controls shared target changes</text>
+        <path d="M180 574 C180 625 179 625 180 645" stroke="#c6684b" stroke-width="2" stroke-dasharray="5 5" fill="none" marker-end="url(#arrm)"/><rect x="55" y="624" width="250" height="48" rx="12" fill="#fff9ee" stroke="#ead9b7"/><text x="180" y="644" fill="#172f39" font-size="12" font-weight="700" text-anchor="middle">More Follow: change target</text><text x="180" y="660" fill="#5c7278" font-size="11" text-anchor="middle">More Fold or tie close: keep target</text>
+      </svg>
+      <p class="caption">The roundtable brings one consequential decision into view: proposed target, people, countdown, and the group’s Follow/Fold/Hold result.</p>
+      <p class="fallback"><strong>Journey in words:</strong> inspect rate graph → compare three target forecasts → create/join a six-digit party room → receive a live or test buzz. A timed Follow/Fold/Hold roundtable handles shared-target changes.</p>
+    </section>
+
+    <h2 class="section-title">Screens and behavior</h2>
+    <p class="intro">Expand each surface to review the user action, resulting behavior, and visible proof.</p>
+    <section class="reveal-list" aria-label="Screen behaviors and acceptance checks">
+      <details open>
+        <summary><span class="badge">01</span> Rate dashboard · graph, target, and entry points</summary>
+        <div class="detail-body">
+          <p>The graph leads. Rate Surveillance defaults to the current two-week graph, its peak, a gently bouncing marker at today, and the value for another day when the traveler scrolls across it. A Bi-Monthly tab offers completed two-month periods labeled across 2022–2026. A scrollable list shows finance, policy, conflict, and trade headlines from the rolling three months, with one tab for each of the latest three calendar months. Each month requests its own archived stories.</p>
+          <div class="checks">
+            <div class="check"><span class="tick">✓</span><span>Current MYR/KRW is shown as KRW per RM1.</span></div>
+            <div class="check"><span class="tick">✓</span><span>The visible graph spans two weeks and identifies the highest rate in that period.</span></div>
+            <div class="check"><span class="tick">✓</span><span>Today has a slow animated pointer; moving across another day reveals its rate.</span></div>
+            <div class="check"><span class="tick">✓</span><span>Multiple linked headlines can be scrolled; only stories from the latest three months appear.</span></div>
+            <div class="check"><span class="tick">✓</span><span>Current, previous, and two-month-prior tabs load the selected month and offer refresh when its source is unavailable.</span></div>
+            <div class="check"><span class="tick">✓</span><span>A headline opens its original report or newspaper article when tapped.</span></div>
+          </div>
+        </div>
+      </details>
+      <details>
+        <summary><span class="badge">02</span> Bi-Monthly rate history · browse two full months</summary>
+        <div class="detail-body">
+          <p>A Bi-Monthly tab inside Rate Surveillance lets the traveler choose completed two-month periods labeled across 2022–2026. In October 2026, the newest option is August–September 2026, followed by June–July and April–May. It shows daily MYR/KRW rates, the period’s highest observed value, and day-by-day details. Missing weekend and holiday publications remain gaps rather than invented points.</p>
+          <div class="checks">
+            <div class="check"><span class="tick">✓</span><span>The 14 Days tab stays the default and Bi-Monthly selects complete two-calendar-month ranges.</span></div>
+            <div class="check"><span class="tick">✓</span><span>The current incomplete period and future periods cannot be selected.</span></div>
+            <div class="check"><span class="tick">✓</span><span>The full selected period, its peak, and selectable daily rates are visible.</span></div>
+            <div class="check"><span class="tick">✓</span><span>Unreliable or missing data keeps the last known result and offers Refresh.</span></div>
+          </div>
+        </div>
+      </details>
+      <details>
+        <summary><span class="badge">03</span> Currency visuals · custom pointer and moving background</summary>
+        <div class="detail-body">
+          <p>Use the small cursor from the supplied snapshot (black arrow, white outline, cyan glow) on every clickable control. Actual Ringgit and Korean Won banknote images fill the background and slowly wave behind the interface. A header switch inverses the interface colors between dark and light mode and saves the choice. Stop the motion when the device requests reduced motion. The rate card omits the “REFERENCE ONLY” stamp.</p>
+        </div>
+      </details>
+      <details>
+        <summary><span class="badge">04</span> Forecast cards · compare target likelihood</summary>
+        <div class="detail-body">
+          <p>Three cards—This month, Next month, and Next 3 months—estimate whether the traveler’s target may be reached. They follow calendar boundaries: This month runs through the current month’s final day; Next month is the following calendar month; the working interpretation of Next 3 months is the three full calendar months after the current one. Each card shares the same chance scale and has a pixel-art meter, a short “Why?” explanation, relevant article links, a data update time, and an uncertainty note. The app never promises an exact date or outcome.</p>
+          <div class="checks">
+            <div class="check"><span class="tick">✓</span><span>All three windows appear side by side and return estimates for the active target.</span></div>
+            <div class="check"><span class="tick">✓</span><span>One shared visual scale makes the windows directly comparable.</span></div>
+            <div class="check"><span class="tick">✓</span><span>Each card explains key market/news factors and shows links and data time.</span></div>
+            <div class="check"><span class="tick">✓</span><span>Uncertainty is visible; no precise predicted date or guarantee is shown.</span></div>
+          </div>
+        </div>
+      </details>
+      <details>
+        <summary><span class="badge">05</span> Party room · create, join, and coordinate</summary>
+        <div class="detail-body">
+          <p>The creator becomes room master, receives a six-digit room number, and sets the initial shared target. Other travelers join by entering the number. Members’ pixel-art traveler avatars appear in a magical-school-style room and can stand, walk, or interact. Connected members receive an in-app alert when the live rate reaches or exceeds target, then another automatic ping every 1.5 hours while the rate stays at or above target. Test Alert demonstrates the shared buzz on demand.</p>
+          <div class="checks">
+            <div class="check"><span class="tick">✓</span><span>Room creation yields a six-digit join number and room-master role.</span></div>
+            <div class="check"><span class="tick">✓</span><span>Room master sets the initial shared target; joining members appear as avatars.</span></div>
+            <div class="check"><span class="tick">✓</span><span>Live threshold and Test Alert both buzz connected members in the room.</span></div>
+            <div class="check"><span class="tick">✓</span><span>Automatic pings repeat every 1.5 hours while the rate stays at/above target, and stop below target.</span></div>
+            <div class="check"><span class="tick">✓</span><span>An unknown number says: “No room found. Do you want to create a new room?”</span></div>
+          </div>
+        </div>
+      </details>
+      <details>
+        <summary><span class="badge">06</span> Roundtable · agree on a new target</summary>
+        <div class="detail-body">
+          <p>Any room member can propose a shared-target change and set a duration. Each member can play Follow or Fold, or draw/play Hold. At expiry, no response becomes Hold; Hold does not count. More Follow than Fold updates the target, more Fold keeps it. A tie lets the raiser extend or close; closing keeps the existing target. If all votes are Hold, the target stays and each traveler is asked whether they want a re-vote.</p>
+          <div class="checks">
+            <div class="check"><span class="tick">✓</span><span>Proposal, proposed rate, raiser, timer, member avatars, and card choices are visible.</span></div>
+            <div class="check"><span class="tick">✓</span><span>Non-responders become Hold at the deadline; Holds are excluded from Follow/Fold counts.</span></div>
+            <div class="check"><span class="tick">✓</span><span>More Follow updates the shared target; more Fold leaves it unchanged.</span></div>
+            <div class="check"><span class="tick">✓</span><span>Tie can be extended or closed by the raiser; closing preserves the old target.</span></div>
+            <div class="check"><span class="tick">✓</span><span>All Holds preserve the target and prompt each traveler about another vote.</span></div>
+          </div>
+        </div>
+      </details>
+      <details>
+        <summary><span class="badge">07</span> Empty and error states · no room or stale data</summary>
+        <div class="detail-body">
+          <div class="states">
+            <div class="state"><strong>No room found</strong><span>Show the prompt to create a new room.</span></div>
+            <div class="state"><strong>Missing or stale rate/news</strong><span>Show a refresh button. If it still fails, keep the last-known rate and timestamp, and say current data/forecast information is unavailable.</span></div>
+            <div class="state"><strong>Round ends with no Follow/Fold votes</strong><span>Keep the target and ask members whether they want a re-vote.</span></div>
+            <div class="state"><strong>Member offline or app closed</strong><span>No background push in this proof; alerts are for connected members.</span></div>
+          </div>
+          <p style="margin-top:14px">Forecast windows follow calendar months. If refresh fails, stale rates remain timestamped and forecast availability is stated clearly.</p>
+        </div>
+      </details>
+    </section>
+
+    <section class="bottom-grid" aria-label="Decisions and deferred work">
+      <article class="card bottom-card decision">
+        <h2>Product decisions</h2>
+        <ul>
+          <li>One pair: MYR/KRW, quoted as KRW per RM1.</li>
+          <li>Graph first, two-week view, with a highlighted peak and moving daily inspection.</li>
+          <li>Real three-window target forecasts, with uncertainty and visible contributing factors.</li>
+          <li>Gamified visuals only; the roundtable cards express agreement, not rewards.</li>
+          <li>Every agreed feature gets a basic working version; the requested Bi-Monthly history, expanded news window, and banknote art extend the original 2–4 hour target.</li>
+        </ul>
+      </article>
+      <article class="card bottom-card deferred">
+        <h2>Deferred from this build</h2>
+        <ul>
+          <li>Background push to offline travelers or when the app is closed.</li>
+          <li>Additional currency pairs and destinations.</li>
+          <li>Broad forecast validation and high-scale production reliability.</li>
+        </ul>
+      </article>
+    </section>
+    <div class="feedback"><strong>Scope-to-PRD expansion:</strong> the scope’s “party target change” is a timed Follow/Fold/Hold roundtable. First-dashboard feedback also added the Bi-Monthly rate tab, rolling three-month news list, snapshot-matched cursor, and full-background banknote animation.</div>
+    <footer>
+      <span>Product plan approved · Markdown remains canonical</span>
+      <span>MYR→KRW · Travel Rate Party</span>
+    </footer>
+  </main>
+</body>
+</html>

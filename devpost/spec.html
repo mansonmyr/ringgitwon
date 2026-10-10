@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#10141e">
+  <title>MYR→KRW Travel Rate Party — Technical Blueprint</title>
+  <style>
+    :root{color-scheme:dark;--bg:#10141e;--panel:#191f2c;--panel2:#202a38;--ink:#eef2e8;--muted:#a5b2bb;--mint:#a8f2c3;--cyan:#70dceb;--amber:#ffc66b;--red:#ff867b;--line:#354452;--pixel:4px;--mono:ui-monospace,SFMono-Regular,Menlo,monospace;--sans:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+    *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 88% 0%,#203348 0,transparent 35%),var(--bg);color:var(--ink);font:16px/1.6 var(--sans)}a{color:var(--cyan)}a:hover{color:var(--mint)}.wrap{width:min(1120px,calc(100% - 36px));margin:auto}header{padding:54px 0 36px;border-bottom:1px solid var(--line)}.eyebrow,.tag,.stepno{font:700 12px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--mint)}h1,h2,h3,p{margin-top:0}h1{max-width:850px;margin-bottom:12px;font-size:clamp(34px,6vw,58px);line-height:1.04;letter-spacing:-.04em}h2{font-size:26px;line-height:1.2;margin:0 0 16px}h3{font-size:18px;line-height:1.3;margin-bottom:8px}.lede{max-width:740px;color:#c8d2d1;font-size:18px}.flag{display:inline-flex;gap:9px;align-items:center;margin-top:12px;padding:8px 12px;border:1px solid #574a32;background:#30271b;color:#ffe0a3;font:700 12px var(--mono);letter-spacing:.04em}.flag:before{content:"";width:8px;height:8px;background:var(--amber);box-shadow:0 0 12px var(--amber)}main{padding:32px 0 70px}.section{margin:0 0 46px}.grid{display:grid;gap:16px}.grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}.grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}.card{background:linear-gradient(145deg,#1b2330,#161c27);border:1px solid var(--line);padding:20px;box-shadow:0 10px 30px #0002}.card.pixel{box-shadow:5px 5px 0 #0a0d13;border:2px solid #506473}.card p:last-child{margin-bottom:0}.muted{color:var(--muted)}.mono{font-family:var(--mono)}.micro{font:12px/1.5 var(--mono);color:var(--muted)}.accent{color:var(--mint)}.amber{color:var(--amber)}.pill{display:inline-block;border:1px solid var(--line);padding:3px 8px;font:11px var(--mono);color:var(--mint);margin:0 5px 5px 0}.svgbox{overflow-x:auto;background:#121925;border:1px solid var(--line);padding:12px}.svgbox svg{min-width:670px;width:100%;height:auto}.journey{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.journey details{background:var(--panel);border:1px solid var(--line);padding:0 14px}.journey summary{list-style:none;cursor:pointer;padding:14px 0;font-weight:750}.journey summary::-webkit-details-marker{display:none}.journey summary:after{content:"+";float:right;color:var(--mint);font:700 20px var(--mono)}.journey details[open] summary:after{content:"−"}.journey details p{color:var(--muted);font-size:14px}.feature{border-top:2px solid var(--mint)}.feature:nth-child(2){border-color:var(--cyan)}.feature:nth-child(3){border-color:var(--amber)}.feature:nth-child(4){border-color:#b29cff}.feature:nth-child(5){border-color:#ff9a7e}.feature:nth-child(6){border-color:#87d5a4}.list{padding-left:19px}.list li{margin:0 0 8px}.callout{border-left:3px solid var(--amber);padding:12px 16px;background:#292419;color:#f4dfb5}.callout.blue{border-color:var(--cyan);background:#17252d;color:#c6e8eb}.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;vertical-align:top;padding:11px 12px;border-bottom:1px solid var(--line)}th{font:700 11px var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--mint)}td:first-child{font-weight:700}.tree,pre{overflow:auto;background:#0b1018;border:1px solid var(--line);padding:18px;color:#d5e3d7;font:13px/1.65 var(--mono)}.meter{height:14px;max-width:220px;border:2px solid #728b87;background:repeating-linear-gradient(90deg,#283a3b 0 11px,#101923 11px 15px);position:relative;margin:10px 0}.meter:before{content:"";position:absolute;inset:2px 34% 2px 2px;background:repeating-linear-gradient(90deg,var(--mint) 0 11px,#79d69c 11px 15px)}.sources li{margin-bottom:8px}.footer{border-top:1px solid var(--line);padding:20px 0 36px;color:var(--muted);font:12px var(--mono)}@media(max-width:760px){.grid.two,.grid.three{grid-template-columns:1fr}.journey{grid-template-columns:1fr 1fr}.wrap{width:min(100% - 24px,700px)}header{padding-top:38px}}@media(max-width:480px){.journey{grid-template-columns:1fr}h1{font-size:37px}}
+  </style>
+</head>
+<body>
+<header><div class="wrap">
+  <div class="eyebrow">DEVPOST LEARN · TECHNICAL BLUEPRINT · APPROVED</div>
+  <h1>MYR <span class="accent">→</span> KRW<br>Travel Rate Party</h1>
+  <p class="lede">A free-to-run public demo for travelers watching the ringgit-to-won reference rate, reading the news, comparing an uncertain forecast, and coordinating with their party.</p>
+  <div class="flag">DAILY REFERENCE RATE · NOT LIVE DEALER PRICING</div>
+</div></header>
+<main class="wrap">
+  <section class="section">
+    <div class="grid two">
+      <article class="card pixel"><div class="tag">THE IDEA IN PLAIN LANGUAGE</div><h2>A website with a shared notebook</h2><p>React draws the dashboard, the Bi-Monthly Rate Surveillance tab, and the room. Frankfurter supplies daily reference rates; GDELT supplies links from a rolling three-month news window divided into individual month tabs. The browser uses rate history and a small news score to calculate experimental target-reach chances.</p><p>Firebase is the shared notebook for rooms and also hosts the website. Travelers sign in anonymously in the background. The first version uses free plans and reaches connected browsers only.</p></article>
+      <article class="card"><div class="tag amber">THE TRADEOFF WE AGREED ON</div><h2>No paid feed for this demo</h2><p>Free public data lets the dashboard be shared without an API key or payment card. Rates refresh when a new daily observation is available. A natural crossing alert can happen only after that new value arrives.</p><p class="muted">Forecasts are experimental; news tone is a rough clue, not a proven measure of currency direction. This is not financial advice.</p></article>
+    </div>
+  </section>
+  <section class="section">
+    <div class="tag">HOW THE PIECES CONNECT</div><h2>The data path</h2>
+    <div class="svgbox" role="img" aria-label="Data flow diagram connecting rate and news services to a browser dashboard and Firebase shared party rooms">
+      <svg viewBox="0 0 980 270" xmlns="http://www.w3.org/2000/svg">
+        <defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#70dceb"/></marker></defs>
+        <rect x="20" y="28" width="220" height="68" rx="4" fill="#1b2934" stroke="#70dceb"/><text x="130" y="57" fill="#eef2e8" font-family="monospace" font-size="15" text-anchor="middle">Frankfurter</text><text x="130" y="78" fill="#a5b2bb" font-family="monospace" font-size="12" text-anchor="middle">daily rates + history</text>
+        <rect x="20" y="158" width="220" height="68" rx="4" fill="#1b2934" stroke="#ffc66b"/><text x="130" y="187" fill="#eef2e8" font-family="monospace" font-size="15" text-anchor="middle">GDELT DOC</text><text x="130" y="208" fill="#a5b2bb" font-family="monospace" font-size="12" text-anchor="middle">news links + dates</text>
+        <rect x="365" y="76" width="250" height="118" rx="4" fill="#202a38" stroke="#a8f2c3" stroke-width="2"/><text x="490" y="108" fill="#a8f2c3" font-family="monospace" font-size="16" text-anchor="middle">Traveler's browser</text><text x="490" y="136" fill="#eef2e8" font-family="monospace" font-size="12" text-anchor="middle">chart · forecast · room UI</text><text x="490" y="158" fill="#eef2e8" font-family="monospace" font-size="12" text-anchor="middle">cross-rate · news heuristic</text><text x="490" y="179" fill="#a5b2bb" font-family="monospace" font-size="11" text-anchor="middle">cached last-known data</text>
+        <rect x="740" y="44" width="220" height="68" rx="4" fill="#2a251d" stroke="#ffc66b"/><text x="850" y="73" fill="#eef2e8" font-family="monospace" font-size="15" text-anchor="middle">Firebase Hosting</text><text x="850" y="94" fill="#a5b2bb" font-family="monospace" font-size="12" text-anchor="middle">public app site</text>
+        <rect x="740" y="158" width="220" height="68" rx="4" fill="#192b2a" stroke="#a8f2c3"/><text x="850" y="187" fill="#eef2e8" font-family="monospace" font-size="15" text-anchor="middle">Realtime Database</text><text x="850" y="208" fill="#a5b2bb" font-family="monospace" font-size="12" text-anchor="middle">shared rooms + votes</text>
+        <path d="M240 62H350" stroke="#70dceb" stroke-width="2" marker-end="url(#arrow)"/><path d="M240 191H350" stroke="#70dceb" stroke-width="2" marker-end="url(#arrow)"/><path d="M615 112H725" stroke="#70dceb" stroke-width="2" marker-end="url(#arrow)"/><path d="M615 162H725" stroke="#70dceb" stroke-width="2" marker-end="url(#arrow)"/><text x="672" y="102" fill="#a5b2bb" font-family="monospace" font-size="10" text-anchor="middle">deploy</text><text x="672" y="183" fill="#a5b2bb" font-family="monospace" font-size="10" text-anchor="middle">sync</text>
+      </svg>
+    </div>
+  </section>
+  <section class="section">
+    <div class="tag">ONE TRAVELER'S JOURNEY</div><h2>Tap a step to see what happens</h2>
+    <div class="journey">
+      <details open><summary><span class="stepno">01</span> Open dashboard</summary><p>Browser fetches the daily rate and news. A failed refresh leaves the last value visible with its timestamp and an unavailable message.</p></details>
+      <details><summary><span class="stepno">02</span> Inspect the graph</summary><p>Two EUR-based historical series are aligned and converted: EUR→KRW divided by EUR→MYR gives KRW per RM1. The app draws 14 days and highlights the peak.</p></details>
+      <details><summary><span class="stepno">02A</span> Browse Bi-Monthly rates</summary><p>A tab in Rate Surveillance requests and caches a selected completed two-month period labeled 2022–2026, with daily rates, period peak, and selected-day details. In October 2026, the newest period is Aug–Sep 2026.</p></details>
+      <details><summary><span class="stepno">03</span> Compare forecast</summary><p>Historical daily changes are sampled into possible paths. The app estimates how many paths meet the target within each calendar window and displays the uncertainty and news context.</p></details>
+      <details><summary><span class="stepno">04</span> Create or join room</summary><p>Firebase assigns an anonymous member ID. A new six-digit room gets a master and target; friends join by code. Unknown codes show the agreed create-room prompt.</p></details>
+      <details><summary><span class="stepno">05</span> Buzz together</summary><p>Test Alert writes a shared event. When a newly published daily rate reaches the target, connected room members see the same event. Open tabs repeat the buzz every 90 minutes while the rate stays above target.</p></details>
+      <details><summary><span class="stepno">06</span> Raise roundtable</summary><p>Members play Follow, Fold, or Hold. At the deadline, no reply counts as Hold; Follow/Fold decides the target, a tie waits for the raiser, and all Hold prompts a revote.</p></details>
+    </div>
+  </section>
+  <section class="section">
+    <div class="tag">BUILDING BLOCKS</div><h2>What each piece owns</h2>
+    <div class="grid three">
+      <article class="card feature"><h3>Rate Surveillance</h3><p>Daily cross-rate, default 14-day SVG chart, Bi-Monthly historical tab, peak, selected-day values, refresh and stale states.</p><div class="micro">PRD → Rate Dashboard and Bi-Monthly Rate Surveillance</div></article>
+      <article class="card feature"><h3>Forecast + headlines</h3><p>Three calendar windows, same-scale meters, “Why?” factors, update time, uncertainty, and a scrollable linked-news list with separate tabs for the current and prior two months.</p><div class="micro">PRD → Forecast Cards and News</div></article>
+      <article class="card feature"><h3>Target + alerts</h3><p>Solo target saved in the browser; room target shared. Test and threshold events sync to connected members.</p><div class="micro">PRD → Target and Alerts</div></article>
+      <article class="card feature"><h3>Party room</h3><p>Six-digit code, master, shared target, nicknames, simple traveler avatars, and connection status.</p><div class="micro">PRD → Party Rooms and Avatars</div></article>
+      <article class="card feature"><h3>Roundtable</h3><p>Timed Follow/Fold/Hold votes, no-response handling, tie extension/close, and all-Hold revote prompt.</p><div class="micro">PRD → Roundtable Target Changes</div></article>
+      <article class="card feature"><h3>Visual identity</h3><p>Pixel details for the hacker-heist dashboard, a small black arrow cursor with white outline and cyan glow on clickable controls, animated real Ringgit and Won banknotes, an inverse-color dark/light switch, and a cozy magical common room. Gamification stays visual.</p><div class="micro">PRD → Look and Feel</div></article>
+    </div>
+  </section>
+  <section class="section">
+    <div class="tag">WHERE DATA LIVES</div><h2>Room record and privacy boundary</h2>
+    <div class="grid two">
+      <div class="card"><h3>Shared in Firebase</h3><pre>{
+  masterUid,
+  sharedTarget,
+  members: { uid: { name, avatar, connected } },
+  alert: { eventId, kind, createdAt, lastRateDate },
+  roundtable: { id, proposal, deadline, status, votes }
+}</pre><p class="muted">Realtime Database listeners deliver changes to open room members. Rules require anonymous sign-in and validate member paths. Do not leave public writes enabled.</p></div>
+      <div class="card"><h3>Kept in the browser</h3><ul class="list"><li>Last rate and its date</li><li>Bi-Monthly history cached by selected date range</li><li>Personal target, nickname, avatar</li><li>Cached three-month headline links and update time</li><li>Forecast is recomputed from current inputs</li></ul><p class="muted">No email/password is needed. Clearing browser data creates a new anonymous identity.</p></div>
+    </div>
+    <p class="callout">This first version has no trusted custom server enforcing room votes. It is a small public demo, not a tamper-proof production service. Do not put private information in room records.</p>
+  </section>
+  <section class="section">
+    <div class="tag">STACK + HOW TO TRY IT</div><h2>Beginner-friendly setup</h2>
+    <div class="grid two">
+      <article class="card"><h3>Tools</h3><p><span class="pill">React</span><span class="pill">TypeScript</span><span class="pill">Vite</span><span class="pill">Firebase</span><span class="pill">SVG</span></p><p>React handles reusable screens; TypeScript catches common mistakes; Vite runs a fast local preview. Firebase supplies room sync and free hosting. SVG keeps the graph dependency-light.</p><p><a href="https://react.dev/learn">React</a> · <a href="https://www.typescriptlang.org/docs/">TypeScript</a> · <a href="https://vite.dev/guide/">Vite</a> · <a href="https://firebase.google.com/docs/web/setup">Firebase Web</a></p></article>
+      <article class="card"><h3>Local preview</h3><pre>npm install
+npm run dev</pre><p>Open Vite's local URL, normally <code>http://localhost:5173</code>. Add Firebase settings to ignored `.env.local` for real shared rooms; setting names go in `.env.example`.</p><h3>Free public demo</h3><pre>npm run build
+npx firebase-tools login
+npx firebase-tools init hosting
+npx firebase-tools deploy --only hosting,database</pre><p class="micro">Firebase Spark has free quotas; over quota, the affected Firebase product pauses until the next month.</p></article>
+    </div>
+    <p class="callout blue">The submission still needs a short demo video and a public GitHub repository. Hosting the app is optional, but this plan includes Firebase Hosting so friends can try the link.</p>
+  </section>
+  <section class="section">
+    <div class="tag">DATA SOURCES WE CHECKED</div><h2>Why daily rates won</h2>
+    <div class="tablewrap card"><table><thead><tr><th>Source</th><th>What we found</th><th>Plan</th></tr></thead><tbody>
+      <tr><td><a href="https://frankfurter.dev/">Frankfurter</a></td><td>Free, no key, daily reference rates and historical series.</td><td class="accent">Use for public demo</td></tr>
+      <tr><td><a href="https://docs.wise.com/api-reference/rate/rateget">Wise</a></td><td>Current/historical API exists; credentials and partner/business access rules apply.</td><td>Not the simple free feed</td></tr>
+      <tr><td><a href="https://developers.google.com/gdata/docs/directory">Google Finance</a></td><td>Legacy Portfolio Data API is shut down with no replacement.</td><td>Do not scrape page</td></tr>
+      <tr><td><a href="https://legal.yahoo.com/us/en/yahoo/terms/otos/index.html">Yahoo Finance</a></td><td>No supported public Forex feed verified; service terms restrict unauthorized automated access and data reuse.</td><td>Do not use unofficial endpoint</td></tr>
+      <tr><td><a href="https://www.forex.com/en-us/premium-trader-tools/api-trading/">FOREX.com</a></td><td>API is a trading integration requiring an account, funding, and access request.</td><td>Outside free-first scope</td></tr>
+      <tr><td><a href="https://twelvedata.com/pricing">Twelve Data</a></td><td>Free tier has real-time Forex/800 daily requests, but its stated use is internal non-display; display is on paid tier.</td><td>Not for public display</td></tr>
+    </tbody></table></div>
+    <p class="micro">News: <a href="https://blog.gdeltproject.org/gdelt-doc-2-0-api-debuts/">GDELT DOC</a> provides broad article search and original links; coverage and automated tone are imperfect.</p>
+  </section>
+  <section class="section">
+    <div class="tag">LIMITS TO SHOW CLEARLY</div><h2>What can fail, and what the app does</h2>
+    <div class="grid three">
+      <article class="card"><h3>Rate/news unavailable</h3><p>Keep last successful data and its timestamp, mark it stale, show Refresh, and hide a current forecast.</p></article>
+      <article class="card"><h3>Room service unavailable</h3><p>Explain that shared room sync is offline. Solo dashboard remains usable; never pretend the party is synced.</p></article>
+      <article class="card"><h3>Free quota reached</h3><p>Show a service-unavailable note. Firebase Spark does not charge overage; service resumes when quota resets unless the owner chooses another plan.</p></article>
+    </div>
+  </section>
+  <section class="section">
+    <div class="tag">PLANNED FILES</div><h2>Where each part will live</h2>
+    <pre class="tree">project/
+├── src/
+│   ├── App.tsx                 # App shell and screens
+│   ├── main.tsx                # React entry
+│   ├── styles.css              # Pixel-heist visuals + responsive layout
+│   ├── types.ts                # Shared data shapes
+│   ├── lib/
+│   │   ├── firebase.ts         # Anonymous sign-in + database setup
+│   │   ├── rates.ts            # Frankfurter + cross-rate + cache
+│   │   ├── news.ts             # GDELT query + normalization
+│   │   ├── forecast.ts         # Simulation + news heuristic
+│   │   ├── rooms.ts            # Create/join/presence/subscriptions
+│   │   ├── roundtable.ts       # Vote and outcome rules
+│   │   └── alerts.ts           # Threshold, test, 90-minute repeat
+│   └── components/             # RateChart, RateHistory, ForecastCards, NewsBanner,
+│                               # PartyRoom, RoundtablePanel
+├── database.rules.json         # Firebase access rules
+├── firebase.json               # Hosting + SPA rewrite
+├── .env.example                # Safe config names only
+├── devpost/spec.md             # Canonical blueprint
+└── README.md                   # Setup, demo, deploy instructions</pre>
+  </section>
+  <section class="section">
+    <div class="tag">REVIEW CHECK</div><h2>The plan is ready to inspect</h2>
+    <div class="grid two"><article class="card"><h3>What looks solid</h3><p>Every behavior in the approved PRD has an implementation home. A single hosted database keeps party sync real, and the free services fit the no-payment constraint.</p></article><article class="card"><h3>Limits to keep in view</h3><p>Daily reference rates change the timing of natural alerts. The forecast is a heuristic that needs examples checked during build. Firebase client-side room rules are not hardened for a production service.</p></article></div>
+    <p class="micro">Canonical technical plan: <a href="spec.md">devpost/spec.md</a>. Status: approved. Provider docs are linked above.</p>
+  </section>
+</main>
+<footer class="footer"><div class="wrap">MYR→KRW TRAVEL RATE PARTY · SPEC APPROVED · CREATED 2026-10-08</div></footer>
+</body>
+</html>

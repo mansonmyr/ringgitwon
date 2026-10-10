@@ -92,7 +92,7 @@ export default function App() {
       <main className="app-shell" data-theme={theme}>
       <div className="scanline" aria-hidden="true" />
       <header className="topbar">
-        <a className="brand" href="#top" aria-label="RinggitWon dashboard home"><span className="brand-mark">RW</span><span>RINGGIT<b>WON</b><small>TRAVEL RATE PARTY</small></span></a>
+        <a className="brand" href="#top" aria-label="Won(da) Won dashboard home"><span className="brand-mark">WW</span><span>WON(DA) <b>WON</b><small>TRAVEL RATE PARTY</small></span></a>
         <a className="top-status" href="#signal-room"><span className="status-led" /> SIGNAL ROOM <span className="top-divider">/</span> MYR → KRW</a>
         <div className="topbar-actions">
           <button className="refresh-button" type="button" onClick={() => { void refresh(true); void intraday.refresh(); }} disabled={refreshing || intraday.loading}>
@@ -142,7 +142,7 @@ export default function App() {
         <div className="note-mark">!</div><div><strong>Indicative rates, not a cash exchange quote.</strong><p>Charts and forecasts use daily reference observations. {useIntraday ? 'The main quote and room use Twelve Data. ' : ''}Rates may differ from what a bank, money changer, or transfer service offers.</p></div>
         <span className={`freshness ${combinedStale || Boolean(intraday.error) || (useIntraday && !intraday.fresh) ? 'is-stale' : ''}`}><i />{combinedStale || Boolean(intraday.error) || (useIntraday && !intraday.fresh) ? 'CHECK DATA' : 'SOURCES READY'}</span>
       </section>
-      <footer className="footer"><span>RINGGITWON // DEMO BUILD</span><span>{rates?.points.length ?? 0} OBSERVATIONS CACHED</span></footer>
+      <footer className="footer"><span>WON(DA) WON // DEMO BUILD</span><span>{rates?.points.length ?? 0} OBSERVATIONS CACHED</span></footer>
       </main>
     </>
   );
