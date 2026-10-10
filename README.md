@@ -124,3 +124,15 @@ The local `/api/news` endpoint reads Malay Mail Malaysia RSS, The Korea Times So
 This endpoint is included in Vite development and preview. Static-only hosting must provide an equivalent backend route. Only headlines, dates, attribution and links are displayed. Publisher terms still apply; CNA describes its feeds as for personal, non-commercial use—review rights before public/commercial distribution: https://www.channelnewsasia.com/rss . Malay Mail source: https://www.malaymail.com/feed/rss/malaysia . No GDELT account or news API key is required.
 
 South Korean feed directory: https://www.koreatimes.co.kr/rss . The South Korea feed is original English reporting; the app does not machine-translate titles.
+
+# Disclaimer
+This repository was part of submission for DevPOST (Build With AI: BASICS 2026) Hackathon.
+This project was developed using AI-assisted coding tools:
+	•	Codex
+	•	Google Antigravity
+    
+Feel free to contact if you would like to share to the social media or re-creation of this repository.
+
+# Citation
+If you use this software, please cite it as: K.H.,Ooi.(2026).Won(da) Won. version: 1.0.0. date-released: 2026-04-04.https://github.com/mansonmyr/wonda_won
+
