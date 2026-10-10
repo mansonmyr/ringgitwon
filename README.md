@@ -8,6 +8,15 @@
 
 The app includes a MYR→KRW dashboard, experimental target simulations, publisher headlines, and Firebase Signal Rooms for shared targets, timed votes and connected-page alerts. Twelve Data supplies the optional main market quote; Frankfurter supplies daily reference charts. News covers Malaysia, English South Korea and international reports for today and the previous two days in MYT, with a maximum of 30 per section.
 
+## Hackathon Planning Documents
+
+Built using the Devpost Learn Skill Pack:
+- [**`scope.md`**](scope.md) — Problem definition, audience, constraints & core journey
+- [**`prd.md`**](prd.md) — Product requirements & functional acceptance criteria
+- [**`spec.md`**](spec.md) — Technical architecture, state machine & API design
+- [**`devpost/checklist.md`**](devpost/checklist.md) — Build slices & implementation verification
+
+
 <img width="797" height="741" alt="dashboard" src="https://github.com/user-attachments/assets/9a49826c-986b-4304-a0a8-fdfbeb559484" />
 
 ## Run locally
