@@ -19,8 +19,11 @@ export function useIntradayRate() {
   const [now, setNow] = useState(Date.now);
   const latest = useRef<IntradayQuote | null>(null);
   const busy = useRef(false);
-  const refresh = useCallback(async () => {
+  const refresh = useCallback(async (force = false) => {
     if (busy.current) return;
+    if (!force && latest.current && Date.now() - Date.parse(latest.current.fetchedAt) < 15 * 60_000) {
+      return;
+    }
     busy.current = true; setLoading(true);
     try {
       const response = await fetch('/api/intraday-rate', { signal: AbortSignal.timeout(12_000) });
