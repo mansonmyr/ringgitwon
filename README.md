@@ -96,14 +96,10 @@ Email signup, verification, unsubscribe controls, and room test-email dispatch a
 
 **Not deployed or connected yet.** Leave `VITE_EMAIL_API_URL` blank until free accounts, a verified Brevo sender, Worker secrets and D1 setup are ready. No emails have been sent; only frontend compilation and Worker syntax have been checked. The email section clearly reports that sending is unavailable until connected. Quota limits, possible missed crossings and at-most-once delivery tradeoffs are documented in the setup guide. This is not a 24/7 delivery guarantee.
 
-### Publisher headlines (replaces GDELT)
+### Publisher headlines
 
 The local `/api/news` endpoint reads Malay Mail Malaysia RSS, The Korea Times South Korea, Economy and Business English RSS, and CNA Business/World RSS. It uses fixed source URLs, a shared 30-minute cache and a one-minute retry delay after failures. Browser storage retains up to 30 headlines per section from the current and previous two calendar days in Malaysia time (90 total), with separate Malaysian/South Korean/international sections and per-feed successful-update timestamps. RSS is a rolling feed, not a complete archive. International coverage uses the publisher’s Business category plus World headlines matching business, war, trade-fair or aviation terms; title matching can miss relevant reports. Limits apply on cache reads, refreshes and display, with minute-by-minute expiry while the section is mounted. Reload uses a fresh 30-minute cache; manual refresh still respects the server cache. Failed sources keep saved reports without resetting their timestamps; forecasts can continue without fresh news.
 
 This endpoint is included in Vite development and preview. Static-only hosting must provide an equivalent backend route. Only headlines, dates, attribution and links are displayed. Publisher terms still apply; CNA describes its feeds as for personal, non-commercial use—review rights before public/commercial distribution: https://www.channelnewsasia.com/rss . Malay Mail source: https://www.malaymail.com/feed/rss/malaysia . No GDELT account or news API key is required.
 
 South Korean feed directory: https://www.koreatimes.co.kr/rss . The South Korea feed is original English reporting; the app does not machine-translate titles.
-
-## Project handoff
-
-See [app map](devpost/app-map.html) for code navigation and [submission guide](devpost/submission-guide.md) for required materials, factual feature inventory and learner writing prompts. The learner's [public repository](https://github.com/mansonmyr/ringgitwon) currently contains only a README and a PolyForm Noncommercial license. Application code still needs uploading, the license needs to meet the hackathon's open-source requirement, and no demo-video URL has been supplied.
