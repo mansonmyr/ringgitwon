@@ -8,6 +8,8 @@
 
 The app includes a MYR→KRW dashboard, experimental target simulations, publisher headlines, and Firebase Signal Rooms for shared targets, timed votes and connected-page alerts. Twelve Data supplies the optional main market quote; Frankfurter supplies daily reference charts. News covers Malaysia, English South Korea and international reports for today and the previous two days in MYT, with a maximum of 30 per section.
 
+<img width="797" height="741" alt="dashboard" src="https://github.com/user-attachments/assets/9a49826c-986b-4304-a0a8-fdfbeb559484" />
+
 ## Run locally
 
 Install dependencies and start the local server:
@@ -45,6 +47,8 @@ Room syncing uses Firebase Anonymous Authentication and Realtime Database on the
 
 Without those settings, the app explains what is needed and keeps the room actions disabled. Room data is client-synchronized for the demo; do not store personal information in a room.
 
+<img width="1280" height="720" alt="signal-room" src="https://github.com/user-attachments/assets/97258cd3-8a39-446a-93c7-7204959b8267" />
+
 ## Data sources
 
 - [Frankfurter](https://frankfurter.dev/) for daily reference rates and rate history.
@@ -63,9 +67,11 @@ The chart and forecasts are informational and do not guarantee an exchange outco
 
 Set a personal target in the Plan section and choose Frankfurter or Twelve Data. Three cards use 2,000 simulated paths sampled from the selected provider’s trailing five years of available daily observations. The actual date span and usable observation count are shown; unavailable history stays explicitly unavailable. Frankfurter retains calendar-day sampling. Twelve Data uses completed UTC weekday closes, includes Friday-to-Monday returns, excludes other missing-weekday gaps and weekend bars, and holds simulated rates flat on weekends. Each provider’s estimate starts at its own latest historical observation. Histories are never spliced or averaged together. They compare this calendar month, next month, and the next three full calendar months in Kuala Lumpur time. The method disclosure explains the small, fading English-headline heuristic. Preliminary historical evaluation found underestimation of target hits; these remain experimental scenarios, not reliable real-world probabilities. Stale/missing inputs suppress the estimates. Personal targets are saved in browser storage. The five-year variants now have a retrospective rate-only evaluation; they are not calibrated probabilities. See the five-year report below. Earlier one-year reports remain preserved. More history includes more market conditions but does not automatically improve accuracy. Twelve Data history is fetched through the server-only `/api/rate-history` endpoint, cached for six hours per process (failed attempts for five minutes), with a fixed five-year MYR/KRW range. Historical bars for the current UTC day are excluded. This route also requires a backend when deploying; it is available locally via Vite development/preview. Official [historical API guidance](https://support.twelvedata.com/en/articles/5214728-getting-historical-data) documents date bounds and the 5,000-row maximum; five years of daily bars fits one request.
 
-### Forecast evaluation and MiroFish experiment
+### Forecast evaluation and MiroFish experiment(future development)
 
 The [historical report](devpost/validation/forecast-backtest.md) evaluates 393 overlapping cases using historical monthly origins and targets 1%, 3%, and 5% above the starting rate. Each forecast sees only its trailing year. The next-month mean estimate was 20.5%, versus 34.1% observed target hits. The simulator beats the no-change baseline but loses to a simple historical-frequency baseline for the first two horizons. Cases are correlated; this is exploratory evidence, not an independent accuracy claim. Those figures describe the preserved original model.
+
+<img width="797" height="741" alt="forecasts" src="https://github.com/user-attachments/assets/fc685688-eb5e-469c-8011-ca1280cccbc0" />
 
 The [calendar-corrected report](devpost/validation/forecast-calendar-v2.md) repeats the same cases with one-day changes sampled separately for each day of the week, including weekends. Missing-date returns are excluded, and eight samples per weekday are required. Next-month estimates average 26.5%, with lower probability error than the original model, but underestimation remains. This is development-data evidence, not an untouched holdout. The next-month score is approximately tied with the historical-frequency comparator.
 
