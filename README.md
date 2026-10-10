@@ -1,4 +1,10 @@
-# RinggitWon — MYR / KRW Watch
+# Won(da) Won — MYR / KRW Watch
+
+<p align="center">
+  <a href="https://wondawon.netlify.app">
+    <img src="https://img.shields.io/badge/Launch_Live_Demo-00AD9F?style=for-the-badge&logo=netlify&logoColor=white" alt="Live Demo">
+  </a>
+</p>
 
 The app includes a MYR→KRW dashboard, experimental target simulations, publisher headlines, and Firebase Signal Rooms for shared targets, timed votes and connected-page alerts. Twelve Data supplies the optional main market quote; Frankfurter supplies daily reference charts. News covers Malaysia, English South Korea and international reports for today and the previous two days in MYT, with a maximum of 30 per section.
 
