@@ -1,12 +1,29 @@
 [build]
   command = "npm run build"
   publish = "dist"
+  functions = "netlify/functions"
 
 [build.environment]
   SECRETS_SCAN_OMIT_KEYS = "VITE_FIREBASE_API_KEY,VITE_FIREBASE_APP_ID,VITE_FIREBASE_AUTH_DOMAIN,VITE_FIREBASE_DATABASE_URL,VITE_FIREBASE_PROJECT_ID,TWELVE_DATA_API_KEY"
   SECRETS_SCAN_OMIT_PATHS = "dist/**"
 
 [[redirects]]
+  from = "/api/news"
+  to = "/.netlify/functions/news"
+  status = 200
+
+[[redirects]]
+  from = "/api/intraday-rate"
+  to = "/.netlify/functions/intraday-rate"
+  status = 200
+
+[[redirects]]
+  from = "/api/rate-history"
+  to = "/.netlify/functions/rate-history"
+  status = 200
+
+[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
+
