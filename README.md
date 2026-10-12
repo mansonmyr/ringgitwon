@@ -131,7 +131,6 @@ South Korean feed directory: https://www.koreatimes.co.kr/rss . The South Korea 
 This repository was part of submission for DevPOST (Build With AI: BASICS 2026) Hackathon.
 This project was developed using AI-assisted coding tools:
 	•	Codex
-	•	Google Antigravity
     
 Feel free to contact if you would like to share to the social media or re-creation of this repository.
 
