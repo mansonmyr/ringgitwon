@@ -136,5 +136,5 @@ This project was developed using AI-assisted coding tools:
 Feel free to contact if you would like to share to the social media or re-creation of this repository.
 
 # Citation
-If you use this software, please cite it as: K.H.,Ooi.(2026).Won(da) Won. version: 1.0.0. date-released: 2026-04-04.https://github.com/mansonmyr/wonda_won
+If you use this software, please cite it as: K.H.,Ooi.(2026).Won(da) Won. version: 1.0.0. date-released: 2026-10-10.https://github.com/mansonmyr/wonda_won
 
